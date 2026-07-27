@@ -10,4 +10,4 @@ Simple booking website for party rentals, including:
 
 ## Run locally
 
-Open `/home/runner/work/YouR-Party-Rentals/YouR-Party-Rentals/index.html` in a browser.
+Open `index.html` in a browser.

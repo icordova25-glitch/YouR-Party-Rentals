@@ -131,15 +131,24 @@
           return;
         }
 
-        const itemLines = selectedItems
-          .map((entry) => `${entry.item[0].toUpperCase()}${entry.item.slice(1)}: ${entry.qty}`)
-          .join("<br>");
-
         summary.hidden = false;
-        summaryContent.innerHTML =
-          `Thank you, ${clientName}.<br>` +
-          `We received your booking request at ${clientEmail}.<br><br>` +
-          `${itemLines}`;
+        summaryContent.textContent = "";
+
+        const thankYou = document.createElement("p");
+        thankYou.textContent = `Thank you, ${clientName}.`;
+        summaryContent.appendChild(thankYou);
+
+        const confirmation = document.createElement("p");
+        confirmation.textContent = `We received your booking request at ${clientEmail}.`;
+        summaryContent.appendChild(confirmation);
+
+        const itemList = document.createElement("ul");
+        selectedItems.forEach((entry) => {
+          const listItem = document.createElement("li");
+          listItem.textContent = `${entry.item[0].toUpperCase()}${entry.item.slice(1)}: ${entry.qty}`;
+          itemList.appendChild(listItem);
+        });
+        summaryContent.appendChild(itemList);
       });
     </script>
   </body>
