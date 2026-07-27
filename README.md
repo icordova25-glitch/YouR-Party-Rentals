@@ -1,4 +1,4 @@
-# YouR-Party-Rentals
+# Your-Party-Rentals
 
 Simple booking website for party rentals, including:
 
