@@ -14,7 +14,7 @@
         color: #1f2937;
       }
       .container {
-        max-width: 760px;
+        max-width: 960px;
         margin: 0 auto;
         padding: 24px;
       }
@@ -61,12 +61,77 @@
         margin-top: 14px;
         line-height: 1.5;
       }
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+      }
+      .gallery-item {
+        overflow: hidden;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+      }
+      .gallery-item img {
+        display: block;
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+      .gallery-caption {
+        padding: 12px;
+      }
+      .gallery-caption h3 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+      }
+      .gallery-caption p {
+        margin: 0;
+        color: #4b5563;
+        font-size: 0.95rem;
+      }
     </style>
   </head>
   <body>
     <main class="container">
       <h1>Your Party Rentals</h1>
       <p>Book tables, chairs, canopies, fans, and coolers for your event.</p>
+
+      <section class="card" aria-labelledby="gallery-title">
+        <h2 id="gallery-title">Rental gallery</h2>
+        <p>Browse a few of our most requested setup options.</p>
+        <div class="gallery-grid">
+          <article class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=900&q=80" alt="Round event tables arranged for an outdoor party" />
+            <div class="gallery-caption">
+              <h3>Event tables</h3>
+              <p>Durable tables ready for birthdays, weddings, and family gatherings.</p>
+            </div>
+          </article>
+          <article class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=900&q=80" alt="Rows of white chairs set up for a celebration" />
+            <div class="gallery-caption">
+              <h3>Comfortable chairs</h3>
+              <p>Reliable seating options that work for both indoor and outdoor events.</p>
+            </div>
+          </article>
+          <article class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?auto=format&fit=crop&w=900&q=80" alt="Large canopy tent covering a decorated party area" />
+            <div class="gallery-caption">
+              <h3>Canopy coverage</h3>
+              <p>Keep guests shaded and protected with spacious event canopies.</p>
+            </div>
+          </article>
+          <article class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80" alt="Coolers and party supplies prepared for an outdoor event" />
+            <div class="gallery-caption">
+              <h3>Party essentials</h3>
+              <p>Add coolers and fans to keep drinks chilled and guests comfortable.</p>
+            </div>
+          </article>
+        </div>
+      </section>
 
       <form id="booking-form" class="card">
         <div class="row">
