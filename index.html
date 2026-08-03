@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Party Rentals</title>
+    <style>
+      :root {
+        font-family: Arial, sans-serif;
+      }
+      body {
+        margin: 0;
+        background: #f7f8fb;
+        color: #1f2937;
+      }
+      .container {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      h1 {
+        margin-bottom: 8px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 18px;
+        margin-top: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+        margin: 10px 0;
+      }
+      input[type="number"],
+      input[type="text"],
+      input[type="email"] {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 8px;
+      }
+      label {
+        font-weight: 600;
+      }
+      button {
+        border: none;
+        background: #2563eb;
+        color: #fff;
+        border-radius: 8px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      button:hover {
+        background: #1d4ed8;
+      }
+      .summary {
+        margin-top: 14px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Your Party Rentals</h1>
+      <p>Book tables, chairs, canopies, fans, and coolers for your event.</p>
+
+      <form id="booking-form" class="card">
+        <div class="row">
+          <label for="clientName">Client name</label>
+          <input id="clientName" name="clientName" type="text" required />
+        </div>
+        <div class="row">
+          <label for="clientEmail">Client email</label>
+          <input id="clientEmail" name="clientEmail" type="email" required />
+        </div>
+        <div class="row">
+          <label for="tables">Tables</label>
+          <input id="tables" name="tables" type="number" min="0" value="0" />
+        </div>
+        <div class="row">
+          <label for="chairs">Chairs</label>
+          <input id="chairs" name="chairs" type="number" min="0" value="0" />
+        </div>
+        <div class="row">
+          <label for="canopies">Canopies</label>
+          <input id="canopies" name="canopies" type="number" min="0" value="0" />
+        </div>
+        <div class="row">
+          <label for="fans">Fans</label>
+          <input id="fans" name="fans" type="number" min="0" value="0" />
+        </div>
+        <div class="row">
+          <label for="coolers">Coolers</label>
+          <input id="coolers" name="coolers" type="number" min="0" value="0" />
+        </div>
+        <button type="submit">Book now</button>
+      </form>
+
+      <section id="booking-summary" class="card" hidden>
+        <h2>Booking confirmation</h2>
+        <div class="summary" id="summary-content"></div>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById("booking-form");
+      const summary = document.getElementById("booking-summary");
+      const summaryContent = document.getElementById("summary-content");
+      const rentalItems = ["tables", "chairs", "canopies", "fans", "coolers"];
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const clientName = formData.get("clientName");
+        const clientEmail = formData.get("clientEmail");
+        const selectedItems = rentalItems
+          .map((item) => {
+            const qty = Number(formData.get(item) || 0);
+            return { item, qty };
+          })
+          .filter((entry) => entry.qty > 0);
+
+        if (!selectedItems.length) {
+          summary.hidden = false;
+          summaryContent.textContent = "Please choose at least one rental item to complete your booking.";
+          return;
+        }
+
+        summary.hidden = false;
+        summaryContent.textContent = "";
+
+        const thankYou = document.createElement("p");
+        thankYou.textContent = `Thank you, ${clientName}.`;
+        summaryContent.appendChild(thankYou);
+
+        const confirmation = document.createElement("p");
+        confirmation.textContent = `We received your booking request at ${clientEmail}.`;
+        summaryContent.appendChild(confirmation);
+
+        const itemList = document.createElement("ul");
+        selectedItems.forEach((entry) => {
+          const listItem = document.createElement("li");
+          listItem.textContent = `${entry.item[0].toUpperCase()}${entry.item.slice(1)}: ${entry.qty}`;
+          itemList.appendChild(listItem);
+        });
+        summaryContent.appendChild(itemList);
+      });
+    </script>
+  </body>
+</html>
