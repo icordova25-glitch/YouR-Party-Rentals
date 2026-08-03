@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Party Rentals Admin</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Arial, sans-serif;
+        --bg: #f3f4f6;
+        --card: #ffffff;
+        --text: #111827;
+        --muted: #6b7280;
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --border: #d1d5db;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: linear-gradient(180deg, #e0e7ff 0%, var(--bg) 35%);
+        color: var(--text);
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 24px 48px;
+      }
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .topbar a,
+      button {
+        border: none;
+        border-radius: 10px;
+        background: var(--primary);
+        color: #fff;
+        padding: 10px 16px;
+        text-decoration: none;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .topbar a:hover,
+      button:hover {
+        background: var(--primary-dark);
+      }
+      .hero,
+      .card {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 18px;
+        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+      }
+      .hero {
+        padding: 28px;
+        margin-bottom: 20px;
+      }
+      .hero p,
+      .card p {
+        color: var(--muted);
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+      }
+      .card {
+        padding: 20px;
+      }
+      .field {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      label {
+        font-weight: 700;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: inherit;
+        background: #fff;
+      }
+      textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+      .inventory-grid,
+      .calendar-grid {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+      .inventory-row,
+      .calendar-row {
+        display: grid;
+        grid-template-columns: 1fr 120px;
+        gap: 10px;
+      }
+      .calendar-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .status {
+        margin-top: 16px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #dbeafe;
+        color: #1e3a8a;
+        font-weight: 600;
+      }
+      @media (max-width: 640px) {
+        .topbar,
+        .inventory-row,
+        .calendar-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <div class="topbar">
+        <div>
+          <h1>Admin dashboard</h1>
+          <p>Manage website content and rental availability from a separate page.</p>
+        </div>
+        <a href="/index.html">View public site</a>
+      </div>
+
+      <section class="hero">
+        <h2>Operations overview</h2>
+        <p>Use this admin page to stage image updates, share payment instructions, track stock, and block dates with event times.</p>
+      </section>
+
+      <section class="layout">
+        <article class="card">
+          <h2>Gallery image uploads</h2>
+          <p>Select images for future gallery updates.</p>
+          <div class="field">
+            <label for="galleryImages">Upload images</label>
+            <input id="galleryImages" type="file" accept="image/*" multiple />
+          </div>
+          <div class="field">
+            <label for="imageNotes">Image notes</label>
+            <textarea id="imageNotes" placeholder="Add labels, placement notes, or approval details."></textarea>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Banking information</h2>
+          <p>Store payment instructions for invoices and deposits.</p>
+          <div class="field">
+            <label for="bankName">Bank name</label>
+            <input id="bankName" type="text" placeholder="Example Bank" />
+          </div>
+          <div class="field">
+            <label for="accountName">Account name</label>
+            <input id="accountName" type="text" placeholder="Your Party Rentals LLC" />
+          </div>
+          <div class="field">
+            <label for="accountNumber">Account / routing details</label>
+            <textarea id="accountNumber" placeholder="Enter account number, routing number, or transfer instructions."></textarea>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Inventory management</h2>
+          <p>Adjust current stock counts for each rental category.</p>
+          <div class="inventory-grid">
+            <div class="inventory-row">
+              <input type="text" value="Tables" aria-label="Inventory item tables" />
+              <input type="number" min="0" value="24" aria-label="Inventory quantity tables" />
+            </div>
+            <div class="inventory-row">
+              <input type="text" value="Chairs" aria-label="Inventory item chairs" />
+              <input type="number" min="0" value="120" aria-label="Inventory quantity chairs" />
+            </div>
+            <div class="inventory-row">
+              <input type="text" value="Canopies" aria-label="Inventory item canopies" />
+              <input type="number" min="0" value="8" aria-label="Inventory quantity canopies" />
+            </div>
+            <div class="inventory-row">
+              <input type="text" value="Fans" aria-label="Inventory item fans" />
+              <input type="number" min="0" value="12" aria-label="Inventory quantity fans" />
+            </div>
+            <div class="inventory-row">
+              <input type="text" value="Coolers" aria-label="Inventory item coolers" />
+              <input type="number" min="0" value="10" aria-label="Inventory quantity coolers" />
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Calendar schedule</h2>
+          <p>Track reserved dates and the delivery or pickup time windows.</p>
+          <div class="calendar-grid">
+            <div class="calendar-row">
+              <input type="datetime-local" aria-label="Reservation start" />
+              <input type="datetime-local" aria-label="Reservation end" />
+            </div>
+            <div class="calendar-row">
+              <input type="datetime-local" aria-label="Second reservation start" />
+              <input type="datetime-local" aria-label="Second reservation end" />
+            </div>
+            <div class="field">
+              <label for="calendarNotes">Schedule notes</label>
+              <textarea id="calendarNotes" placeholder="Add customer names, venue notes, or setup instructions."></textarea>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="card">
+        <h2>Save changes</h2>
+        <p>This static prototype demonstrates the admin workflow and layout.</p>
+        <button type="button" id="saveButton">Save admin updates</button>
+        <div id="statusMessage" class="status" hidden>Admin changes saved locally in this prototype view.</div>
+      </section>
+    </main>
+
+    <script>
+      const saveButton = document.getElementById("saveButton");
+      const statusMessage = document.getElementById("statusMessage");
+
+      saveButton.addEventListener("click", () => {
+        statusMessage.hidden = false;
+      });
+    </script>
+  </body>
+</html>
