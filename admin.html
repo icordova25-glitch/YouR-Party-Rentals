@@ -8,27 +8,36 @@
       :root {
         color-scheme: light;
         font-family: Arial, sans-serif;
-        --bg: #f3f4f6;
-        --card: #ffffff;
-        --text: #111827;
-        --muted: #6b7280;
+        --bg: #f3f6fb;
+        --panel: #ffffff;
+        --panel-alt: #eff6ff;
+        --text: #0f172a;
+        --muted: #64748b;
         --primary: #2563eb;
         --primary-dark: #1d4ed8;
-        --border: #d1d5db;
+        --border: #d7e2ef;
+        --success: #166534;
+        --success-bg: #dcfce7;
+        --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        --radius: 22px;
       }
+
       * {
         box-sizing: border-box;
       }
+
       body {
         margin: 0;
-        background: linear-gradient(180deg, #e0e7ff 0%, var(--bg) 35%);
+        background: linear-gradient(180deg, #dbeafe 0%, var(--bg) 30%, #ffffff 100%);
         color: var(--text);
       }
+
       .container {
-        max-width: 1100px;
+        width: min(1240px, calc(100% - 32px));
         margin: 0 auto;
-        padding: 32px 24px 48px;
+        padding: 28px 0 48px;
       }
+
       .topbar {
         display: flex;
         justify-content: space-between;
@@ -36,94 +45,233 @@
         gap: 16px;
         margin-bottom: 24px;
       }
-      .topbar a,
-      button {
-        border: none;
-        border-radius: 10px;
-        background: var(--primary);
-        color: #fff;
-        padding: 10px 16px;
-        text-decoration: none;
-        font-weight: 700;
-        cursor: pointer;
-      }
-      .topbar a:hover,
-      button:hover {
-        background: var(--primary-dark);
-      }
-      .hero,
-      .card {
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        border-radius: 18px;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
-      }
-      .hero {
-        padding: 28px;
-        margin-bottom: 20px;
-      }
-      .hero p,
-      .card p {
+
+      .brand small,
+      .panel p,
+      .eyebrow,
+      .metric span,
+      .status,
+      .helper,
+      .action-note {
         color: var(--muted);
       }
-      .layout {
+
+      .button,
+      button,
+      .topbar a {
+        border: none;
+        border-radius: 999px;
+        background: var(--primary);
+        color: #fff;
+        padding: 11px 18px;
+        text-decoration: none;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .button:hover,
+      button:hover,
+      .topbar a:hover {
+        background: var(--primary-dark);
+      }
+
+      .button.secondary {
+        background: #fff;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
+      .hero,
+      .panel,
+      .action-bar,
+      .status-banner {
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(215, 226, 239, 0.96);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+
+      .hero,
+      .panel,
+      .action-bar,
+      .status-banner {
+        padding: 24px;
+      }
+
+      .hero {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: 1.3fr 0.9fr;
+        gap: 20px;
+        margin-bottom: 22px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin-top: 0;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.1rem, 5vw, 3.5rem);
+        margin: 14px 0;
+      }
+
+      .hero-copy {
+        font-size: 1.04rem;
+        line-height: 1.7;
+        color: #334155;
+      }
+
+      .hero-actions,
+      .quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .summary-grid,
+      .main-grid,
+      .sub-grid,
+      .inventory-grid,
+      .calendar-grid,
+      .contact-grid {
+        display: grid;
         gap: 18px;
       }
-      .card {
-        padding: 20px;
+
+      .summary-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        margin-bottom: 22px;
       }
+
+      .metric {
+        padding: 22px;
+        border-radius: 18px;
+        background: #f8fbff;
+        border: 1px solid #dbeafe;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+
+      .main-grid {
+        grid-template-columns: 1.2fr 0.8fr;
+        align-items: start;
+      }
+
+      .sub-grid,
+      .contact-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+
       .field {
         display: grid;
         gap: 8px;
         margin-top: 14px;
       }
+
       label {
         font-weight: 700;
       }
+
       input,
       textarea,
       select {
         width: 100%;
         border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 10px 12px;
+        border-radius: 14px;
+        padding: 11px 13px;
         font: inherit;
         background: #fff;
       }
+
       textarea {
-        min-height: 96px;
+        min-height: 108px;
         resize: vertical;
       }
-      .inventory-grid,
-      .calendar-grid {
+
+      .inventory-grid .inventory-row,
+      .calendar-grid .calendar-row {
         display: grid;
-        gap: 12px;
-        margin-top: 14px;
-      }
-      .inventory-row,
-      .calendar-row {
-        display: grid;
-        grid-template-columns: 1fr 120px;
         gap: 10px;
       }
-      .calendar-row {
+
+      .inventory-grid .inventory-row {
+        grid-template-columns: 1fr 120px 150px;
+      }
+
+      .calendar-grid .calendar-row {
         grid-template-columns: 1fr 1fr;
       }
-      .status {
-        margin-top: 16px;
-        padding: 12px 14px;
-        border-radius: 12px;
-        background: #dbeafe;
-        color: #1e3a8a;
-        font-weight: 600;
+
+      .panel-list {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0 0;
+        display: grid;
+        gap: 10px;
       }
-      @media (max-width: 640px) {
-        .topbar,
-        .inventory-row,
-        .calendar-row {
+
+      .panel-list li {
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+      }
+
+      .action-bar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-top: 22px;
+      }
+
+      .status-banner {
+        margin-top: 16px;
+        background: var(--success-bg);
+        color: var(--success);
+        border-color: #bbf7d0;
+        font-weight: 700;
+      }
+
+      @media (max-width: 940px) {
+        .hero,
+        .main-grid,
+        .inventory-grid .inventory-row,
+        .calendar-grid .calendar-row {
           grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .container {
+          width: min(100% - 24px, 1240px);
+        }
+
+        .topbar,
+        .action-bar {
+          flex-direction: column;
+          align-items: flex-start;
         }
       }
     </style>
@@ -131,111 +279,227 @@
   <body>
     <main class="container">
       <div class="topbar">
-        <div>
-          <h1>Admin dashboard</h1>
-          <p>Manage website content and rental availability from a separate page.</p>
+        <div class="brand">
+          <small class="eyebrow">Admin dashboard</small>
+          <h1>Your Party Rentals operations</h1>
+          <small>Manage website content, booking guidance, inventory, and payment readiness from one place.</small>
         </div>
-        <a href="/index.html">View public site</a>
+        <div class="quick-actions">
+          <a class="button secondary" href="/index.html">View public site</a>
+          <button type="button">Export updates</button>
+        </div>
       </div>
 
       <section class="hero">
-        <h2>Operations overview</h2>
-        <p>Use this admin page to stage image updates, share payment instructions, track stock, and block dates with event times.</p>
+        <div>
+          <span class="eyebrow">Daily overview</span>
+          <h2>Keep the customer-facing site polished and the team aligned on next actions.</h2>
+          <p class="hero-copy">
+            This dashboard layout groups the core admin tasks into clear panels so you can update imagery,
+            inventory, scheduling, and payment guidance without hunting through a single long page.
+          </p>
+          <div class="hero-actions">
+            <button type="button" id="saveButton">Save admin updates</button>
+            <button type="button" class="button secondary">Review booking guidance</button>
+          </div>
+        </div>
+        <div class="panel">
+          <span class="eyebrow">Next actions</span>
+          <ul class="panel-list">
+            <li>Refresh featured gallery assets for the public showcase</li>
+            <li>Confirm payment instructions before sending new invoices</li>
+            <li>Review inventory counts for this weekend's scheduled events</li>
+            <li>Block delivery and pickup windows for upcoming reservations</li>
+          </ul>
+        </div>
       </section>
 
-      <section class="layout">
-        <article class="card">
-          <h2>Gallery image uploads</h2>
-          <p>Select images for future gallery updates.</p>
-          <div class="field">
-            <label for="galleryImages">Upload images</label>
-            <input id="galleryImages" type="file" accept="image/*" multiple />
-          </div>
-          <div class="field">
-            <label for="imageNotes">Image notes</label>
-            <textarea id="imageNotes" placeholder="Add labels, placement notes, or approval details."></textarea>
-          </div>
+      <section class="summary-grid" aria-label="Summary statistics">
+        <article class="metric">
+          <strong>24</strong>
+          <span>Tables ready to reserve</span>
         </article>
-
-        <article class="card">
-          <h2>Banking information</h2>
-          <p>Store payment instructions for invoices and deposits.</p>
-          <div class="field">
-            <label for="bankName">Bank name</label>
-            <input id="bankName" type="text" placeholder="Example Bank" />
-          </div>
-          <div class="field">
-            <label for="accountName">Account name</label>
-            <input id="accountName" type="text" placeholder="Your Party Rentals LLC" />
-          </div>
-          <div class="field">
-            <label for="accountNumber">Account / routing details</label>
-            <textarea id="accountNumber" placeholder="Enter account number, routing number, or transfer instructions."></textarea>
-          </div>
+        <article class="metric">
+          <strong>120</strong>
+          <span>Chair inventory on hand</span>
         </article>
-
-        <article class="card">
-          <h2>Inventory management</h2>
-          <p>Adjust current stock counts for each rental category.</p>
-          <div class="inventory-grid">
-            <div class="inventory-row">
-              <input type="text" value="Tables" aria-label="Inventory item tables" />
-              <input type="number" min="0" value="24" aria-label="Inventory quantity tables" />
-            </div>
-            <div class="inventory-row">
-              <input type="text" value="Chairs" aria-label="Inventory item chairs" />
-              <input type="number" min="0" value="120" aria-label="Inventory quantity chairs" />
-            </div>
-            <div class="inventory-row">
-              <input type="text" value="Canopies" aria-label="Inventory item canopies" />
-              <input type="number" min="0" value="8" aria-label="Inventory quantity canopies" />
-            </div>
-            <div class="inventory-row">
-              <input type="text" value="Fans" aria-label="Inventory item fans" />
-              <input type="number" min="0" value="12" aria-label="Inventory quantity fans" />
-            </div>
-            <div class="inventory-row">
-              <input type="text" value="Coolers" aria-label="Inventory item coolers" />
-              <input type="number" min="0" value="10" aria-label="Inventory quantity coolers" />
-            </div>
-          </div>
+        <article class="metric">
+          <strong>8</strong>
+          <span>Canopies available this week</span>
         </article>
+        <article class="metric">
+          <strong>2</strong>
+          <span>Event windows currently blocked</span>
+        </article>
+      </section>
 
-        <article class="card">
-          <h2>Calendar schedule</h2>
-          <p>Track reserved dates and the delivery or pickup time windows.</p>
-          <div class="calendar-grid">
-            <div class="calendar-row">
-              <input type="datetime-local" aria-label="Reservation start" />
-              <input type="datetime-local" aria-label="Reservation end" />
-            </div>
-            <div class="calendar-row">
-              <input type="datetime-local" aria-label="Second reservation start" />
-              <input type="datetime-local" aria-label="Second reservation end" />
+      <section class="main-grid">
+        <div class="sub-grid">
+          <article class="panel">
+            <span class="eyebrow">Content management</span>
+            <h2>Gallery image uploads</h2>
+            <p>Select visuals and notes for the upgraded public showcase.</p>
+            <div class="field">
+              <label for="galleryImages">Upload images</label>
+              <input id="galleryImages" type="file" accept="image/*" multiple />
             </div>
             <div class="field">
-              <label for="calendarNotes">Schedule notes</label>
-              <textarea id="calendarNotes" placeholder="Add customer names, venue notes, or setup instructions."></textarea>
+              <label for="imageNotes">Image notes</label>
+              <textarea id="imageNotes" placeholder="Add labels, placement notes, or approval details."></textarea>
             </div>
-          </div>
-        </article>
+          </article>
+
+          <article class="panel">
+            <span class="eyebrow">Inventory control</span>
+            <h2>Featured inventory counts</h2>
+            <p>Track quantities and mark which items should be highlighted on the homepage.</p>
+            <div class="inventory-grid">
+              <div class="inventory-row">
+                <input type="text" value="Tables" aria-label="Inventory item tables" />
+                <input type="number" min="0" value="24" aria-label="Inventory quantity tables" />
+                <select aria-label="Feature status tables">
+                  <option selected>Featured</option>
+                  <option>Standard</option>
+                </select>
+              </div>
+              <div class="inventory-row">
+                <input type="text" value="Chairs" aria-label="Inventory item chairs" />
+                <input type="number" min="0" value="120" aria-label="Inventory quantity chairs" />
+                <select aria-label="Feature status chairs">
+                  <option selected>Featured</option>
+                  <option>Standard</option>
+                </select>
+              </div>
+              <div class="inventory-row">
+                <input type="text" value="Canopies" aria-label="Inventory item canopies" />
+                <input type="number" min="0" value="8" aria-label="Inventory quantity canopies" />
+                <select aria-label="Feature status canopies">
+                  <option selected>Featured</option>
+                  <option>Standard</option>
+                </select>
+              </div>
+              <div class="inventory-row">
+                <input type="text" value="Fans" aria-label="Inventory item fans" />
+                <input type="number" min="0" value="12" aria-label="Inventory quantity fans" />
+                <select aria-label="Feature status fans">
+                  <option>Featured</option>
+                  <option selected>Standard</option>
+                </select>
+              </div>
+              <div class="inventory-row">
+                <input type="text" value="Coolers" aria-label="Inventory item coolers" />
+                <input type="number" min="0" value="10" aria-label="Inventory quantity coolers" />
+                <select aria-label="Feature status coolers">
+                  <option>Featured</option>
+                  <option selected>Standard</option>
+                </select>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <span class="eyebrow">Scheduling</span>
+            <h2>Calendar and event timing</h2>
+            <p>Group delivery, setup, pickup, and venue notes in a clearer scheduling panel.</p>
+            <div class="calendar-grid">
+              <div class="calendar-row">
+                <input type="datetime-local" aria-label="Reservation start" />
+                <input type="datetime-local" aria-label="Reservation end" />
+              </div>
+              <div class="calendar-row">
+                <input type="datetime-local" aria-label="Second reservation start" />
+                <input type="datetime-local" aria-label="Second reservation end" />
+              </div>
+              <div class="field">
+                <label for="calendarNotes">Schedule notes</label>
+                <textarea id="calendarNotes" placeholder="Add customer names, venue notes, setup instructions, or staffing reminders."></textarea>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="sub-grid">
+          <article class="panel">
+            <span class="eyebrow">Payment support</span>
+            <h2>Banking information</h2>
+            <p>Keep invoice and deposit instructions ready for customers who need next-step payment guidance.</p>
+            <div class="field">
+              <label for="bankName">Bank name</label>
+              <input id="bankName" type="text" placeholder="Example Bank" />
+            </div>
+            <div class="field">
+              <label for="accountName">Account name</label>
+              <input id="accountName" type="text" placeholder="Your Party Rentals LLC" />
+            </div>
+            <div class="field">
+              <label for="accountNumber">Account / routing details</label>
+              <textarea id="accountNumber" placeholder="Enter account number, routing number, or transfer instructions."></textarea>
+            </div>
+          </article>
+
+          <article class="panel">
+            <span class="eyebrow">Customer guidance</span>
+            <h2>Contact and booking callouts</h2>
+            <p>Prepare the content customers need after they submit a quote request.</p>
+            <div class="contact-grid">
+              <div>
+                <h3>What to tell customers</h3>
+                <ul class="panel-list">
+                  <li>Confirm availability and delivery timing</li>
+                  <li>Share payment instructions and due dates</li>
+                  <li>Recommend add-ons based on guest count and weather</li>
+                </ul>
+              </div>
+              <div>
+                <h3>Internal reminders</h3>
+                <ul class="panel-list">
+                  <li>Check event address and setup access details</li>
+                  <li>Verify staff assignments for large orders</li>
+                  <li>Review follow-up timing for pending deposits</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <span class="eyebrow">Action center</span>
+            <h2>Clear next steps</h2>
+            <p class="action-note">Use these grouped actions to keep homepage content and operational details aligned.</p>
+            <div class="hero-actions">
+              <button type="button">Update featured cards</button>
+              <button type="button" class="button secondary">Send payment details</button>
+            </div>
+          </article>
+        </div>
       </section>
 
-      <section class="card">
-        <h2>Save changes</h2>
-        <p>This static prototype demonstrates the admin workflow and layout.</p>
-        <button type="button" id="saveButton">Save admin updates</button>
-        <div id="statusMessage" class="status" hidden>Admin changes saved locally in this prototype view.</div>
+      <section class="action-bar">
+        <div>
+          <h2>Save changes</h2>
+          <p class="helper">This prototype groups admin tasks into clearer sections for a more polished dashboard experience.</p>
+        </div>
+        <div class="hero-actions">
+          <button type="button" id="secondarySaveButton">Save dashboard changes</button>
+          <button type="button" class="button secondary">Preview customer flow</button>
+        </div>
       </section>
+
+      <div id="statusMessage" class="status-banner" hidden>
+        Admin changes saved locally in this prototype dashboard view.
+      </div>
     </main>
 
     <script>
       const saveButton = document.getElementById("saveButton");
+      const secondarySaveButton = document.getElementById("secondarySaveButton");
       const statusMessage = document.getElementById("statusMessage");
 
-      saveButton.addEventListener("click", () => {
+      const showSavedState = () => {
         statusMessage.hidden = false;
-      });
+      };
+
+      saveButton.addEventListener("click", showSavedState);
+      secondarySaveButton.addEventListener("click", showSavedState);
     </script>
   </body>
 </html>
