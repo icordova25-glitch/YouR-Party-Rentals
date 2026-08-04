@@ -6,105 +6,916 @@
     <title>Your Party Rentals</title>
     <style>
       :root {
+        color-scheme: light;
         font-family: Arial, sans-serif;
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --surface-alt: #eff6ff;
+        --text: #0f172a;
+        --muted: #475569;
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --accent: #f59e0b;
+        --border: #dbe4f0;
+        --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+        --radius: 22px;
       }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
         margin: 0;
-        background: #f7f8fb;
-        color: #1f2937;
+        background: linear-gradient(180deg, #eff6ff 0%, var(--bg) 26%, #ffffff 100%);
+        color: var(--text);
       }
+
+      a {
+        color: inherit;
+      }
+
       .container {
-        max-width: 760px;
+        width: min(1180px, calc(100% - 32px));
         margin: 0 auto;
-        padding: 24px;
       }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(12px);
+        background: rgba(248, 250, 252, 0.88);
+        border-bottom: 1px solid rgba(219, 228, 240, 0.9);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 0;
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .brand strong {
+        font-size: 1.1rem;
+      }
+
+      .brand span,
+      .section-intro p,
+      .eyebrow,
+      .meta,
+      .testimonial-role,
+      .booking-note,
+      .summary,
+      .helper-text {
+        color: var(--muted);
+      }
+
+      .nav-links,
+      .nav-actions,
+      .hero-actions,
+      .contact-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        font-weight: 600;
+        color: #334155;
+      }
+
+      .nav-links a:hover {
+        color: var(--primary);
+      }
+
+      .btn,
+      button,
+      .button-link {
+        border: none;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font: inherit;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-primary,
+      button {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24);
+      }
+
+      .btn-primary:hover,
+      button:hover {
+        background: var(--primary-dark);
+      }
+
+      .btn-secondary {
+        background: #fff;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
+      .btn-secondary:hover {
+        border-color: #bfdbfe;
+        color: var(--primary);
+      }
+
+      .hero {
+        padding: 56px 0 32px;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.95fr;
+        gap: 28px;
+        align-items: stretch;
+      }
+
+      .hero-panel,
+      .card,
+      .booking-shell,
+      .cta-banner {
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(219, 228, 240, 0.92);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+
+      .hero-panel {
+        padding: 32px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin-top: 0;
+      }
+
       h1 {
+        font-size: clamp(2.4rem, 6vw, 4.4rem);
+        line-height: 1.02;
+        margin: 16px 0;
+      }
+
+      .hero-copy {
+        font-size: 1.08rem;
+        line-height: 1.7;
+        color: #334155;
+        max-width: 58ch;
+      }
+
+      .hero-points,
+      .steps-list,
+      .service-area-list,
+      .card-list,
+      .summary-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .hero-points {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .hero-points li,
+      .summary-list li {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        font-weight: 600;
+      }
+
+      .hero-aside {
+        display: grid;
+        gap: 18px;
+      }
+
+      .contact-card {
+        padding: 28px;
+        background: linear-gradient(160deg, #0f172a, #1e3a8a);
+        color: #fff;
+      }
+
+      .contact-card p,
+      .contact-card .helper-text {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .contact-card .btn-secondary {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+
+      .mini-grid,
+      .highlights-grid,
+      .catalog-grid,
+      .gallery-grid,
+      .trust-grid,
+      .steps-grid,
+      .service-grid,
+      .testimonial-grid,
+      .info-grid,
+      .summary-grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .mini-grid,
+      .highlights-grid,
+      .trust-grid,
+      .info-grid,
+      .summary-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .catalog-grid,
+      .gallery-grid,
+      .steps-grid,
+      .service-grid,
+      .testimonial-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .stat,
+      .card,
+      .gallery-item,
+      .testimonial,
+      .step-card,
+      .service-card,
+      .info-card {
+        padding: 22px;
+      }
+
+      .stat {
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(219, 228, 240, 0.92);
+        border-radius: 18px;
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 1.8rem;
         margin-bottom: 8px;
       }
-      .card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 18px;
-        margin-top: 16px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+      section {
+        padding: 32px 0;
       }
-      .row {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 8px;
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 22px;
+      }
+
+      .section-header h2 {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        margin-bottom: 10px;
+      }
+
+      .card,
+      .gallery-item,
+      .testimonial,
+      .step-card,
+      .service-card,
+      .info-card,
+      .booking-shell,
+      .cta-banner {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+
+      .catalog-card {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 12px;
+      }
+
+      .price {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary);
+      }
+
+      .tag,
+      .category-pill {
+        display: inline-flex;
         align-items: center;
-        margin: 10px 0;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        font-weight: 700;
       }
+
+      .tag {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .category-pill {
+        background: rgba(15, 23, 42, 0.76);
+        color: #fff;
+      }
+
+      .gallery-item {
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .gallery-image {
+        position: relative;
+        min-height: 220px;
+      }
+
+      .gallery-image img {
+        width: 100%;
+        height: 100%;
+        min-height: 220px;
+        object-fit: cover;
+        display: block;
+      }
+
+      .gallery-image .category-pill {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+      }
+
+      .gallery-copy {
+        padding: 20px;
+      }
+
+      .service-area-list,
+      .card-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .service-area-list li,
+      .card-list li,
+      .steps-list li {
+        position: relative;
+        padding-left: 18px;
+      }
+
+      .service-area-list li::before,
+      .card-list li::before,
+      .steps-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--primary);
+        font-weight: 900;
+      }
+
+      .testimonial blockquote {
+        margin: 0 0 18px;
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #1e293b;
+      }
+
+      .booking-shell {
+        padding: 28px;
+      }
+
+      .booking-grid {
+        display: grid;
+        grid-template-columns: 1fr 0.9fr;
+        gap: 22px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .field,
+      .input-group {
+        display: grid;
+        gap: 8px;
+      }
+
+      .field.full {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        font-weight: 700;
+      }
+
       input[type="number"],
       input[type="text"],
       input[type="email"] {
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        padding: 8px;
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        padding: 12px 14px;
+        font: inherit;
+        background: #fff;
       }
-      label {
-        font-weight: 600;
+
+      input:focus {
+        outline: 2px solid rgba(37, 99, 235, 0.18);
+        border-color: var(--primary);
       }
-      button {
-        border: none;
-        background: #2563eb;
-        color: #fff;
-        border-radius: 8px;
-        padding: 10px 14px;
-        cursor: pointer;
-        font-weight: 700;
+
+      .cta-banner {
+        padding: 26px 28px;
+        background: linear-gradient(140deg, #eff6ff, #ffffff);
       }
-      button:hover {
-        background: #1d4ed8;
+
+      .footer {
+        padding: 32px 0 48px;
+        color: var(--muted);
       }
-      .summary {
-        margin-top: 14px;
-        line-height: 1.5;
+
+      @media (max-width: 900px) {
+        .nav {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .hero-grid,
+        .booking-grid,
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-points {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .container {
+          width: min(100% - 24px, 1180px);
+        }
+
+        .hero-panel,
+        .booking-shell,
+        .contact-card,
+        .stat,
+        .card,
+        .gallery-copy,
+        .testimonial,
+        .step-card,
+        .service-card,
+        .info-card,
+        .cta-banner {
+          padding: 20px;
+        }
+
+        .section-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
       }
     </style>
   </head>
   <body>
-    <main class="container">
-      <h1>Your Party Rentals</h1>
-      <p>Book tables, chairs, canopies, fans, and coolers for your event.</p>
+    <header class="site-header">
+      <div class="container nav">
+        <div class="brand">
+          <strong>Your Party Rentals</strong>
+          <span>Tables, chairs, canopies, fans, and coolers for standout events.</span>
+        </div>
+        <nav class="nav-links" aria-label="Primary navigation">
+          <a href="#inventory">Inventory</a>
+          <a href="#showcase">Showcase</a>
+          <a href="#service">Service</a>
+          <a href="#reviews">Reviews</a>
+          <a href="#book">Book</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="btn btn-secondary" href="/admin.html">Admin</a>
+          <a class="btn btn-primary" href="#book">Get a quote</a>
+        </div>
+      </div>
+    </header>
 
-      <form id="booking-form" class="card">
-        <div class="row">
-          <label for="clientName">Client name</label>
-          <input id="clientName" name="clientName" type="text" required />
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-panel">
+            <span class="eyebrow">Reliable setups for parties, weddings, and community events</span>
+            <h1>Make event planning easier with polished rentals and clear next steps.</h1>
+            <p class="hero-copy">
+              Your Party Rentals helps hosts quickly reserve the essentials, compare featured inventory,
+              and know exactly how booking, delivery, and payment work before the big day.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#book">Start your booking</a>
+              <a class="btn btn-secondary" href="#inventory">Browse featured rentals</a>
+            </div>
+            <ul class="hero-points">
+              <li>Fast quote requests with itemized selections</li>
+              <li>Delivery-ready setups for backyard and venue events</li>
+              <li>Flexible add-ons for comfort, shade, and service flow</li>
+              <li>Simple payment guidance and responsive follow-up</li>
+            </ul>
+          </div>
+          <div class="hero-aside">
+            <aside class="contact-card hero-panel">
+              <span class="eyebrow">Need help choosing?</span>
+              <h2>Talk through your setup before you book.</h2>
+              <p>
+                Share your guest count, event type, and location to get guidance on quantities,
+                timing, and best-fit bundles.
+              </p>
+              <div class="contact-actions">
+                <a class="btn btn-primary" href="#book">Request availability</a>
+                <a class="btn btn-secondary" href="#payment">Payment details</a>
+              </div>
+              <p class="helper-text">Typical response: same day for new quote requests.</p>
+            </aside>
+            <div class="mini-grid">
+              <div class="stat">
+                <strong>5 core categories</strong>
+                <span>Everything from tables to cooling add-ons in one place.</span>
+              </div>
+              <div class="stat">
+                <strong>3 easy steps</strong>
+                <span>Browse, confirm availability, and lock in your event date.</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="row">
-          <label for="clientEmail">Client email</label>
-          <input id="clientEmail" name="clientEmail" type="email" required />
-        </div>
-        <div class="row">
-          <label for="tables">Tables</label>
-          <input id="tables" name="tables" type="number" min="0" value="0" />
-        </div>
-        <div class="row">
-          <label for="chairs">Chairs</label>
-          <input id="chairs" name="chairs" type="number" min="0" value="0" />
-        </div>
-        <div class="row">
-          <label for="canopies">Canopies</label>
-          <input id="canopies" name="canopies" type="number" min="0" value="0" />
-        </div>
-        <div class="row">
-          <label for="fans">Fans</label>
-          <input id="fans" name="fans" type="number" min="0" value="0" />
-        </div>
-        <div class="row">
-          <label for="coolers">Coolers</label>
-          <input id="coolers" name="coolers" type="number" min="0" value="0" />
-        </div>
-        <button type="submit">Book now</button>
-      </form>
+      </section>
 
-      <section id="booking-summary" class="card" hidden>
-        <h2>Booking confirmation</h2>
-        <div class="summary" id="summary-content"></div>
+      <section>
+        <div class="container">
+          <div class="section-header">
+            <div class="section-intro">
+              <span class="eyebrow">Service highlights</span>
+              <h2>A rental partner built around smoother event prep.</h2>
+              <p>Clear communication, practical inventory, and visual browsing make planning less stressful.</p>
+            </div>
+          </div>
+          <div class="highlights-grid">
+            <article class="info-card">
+              <h3>Complete event essentials</h3>
+              <p>Reserve seating, surfaces, shade, and cooling items without juggling multiple vendors.</p>
+            </article>
+            <article class="info-card">
+              <h3>Transparent starting prices</h3>
+              <p>Featured pricing cards help customers budget before sending a quote request.</p>
+            </article>
+            <article class="info-card">
+              <h3>Guided booking flow</h3>
+              <p>Every section points customers toward what to browse, what to submit, and what happens next.</p>
+            </article>
+            <article class="info-card">
+              <h3>Professional presentation</h3>
+              <p>Stronger showcase sections help the site feel like a modern local business, not just a form.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="inventory">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-intro">
+              <span class="eyebrow">Featured inventory</span>
+              <h2>Popular rentals with simple starting prices.</h2>
+              <p>Use these cards to estimate your setup, then send your exact quantities in the booking form below.</p>
+            </div>
+            <a class="btn btn-secondary" href="#book">Build your request</a>
+          </div>
+          <div class="catalog-grid">
+            <article class="card catalog-card">
+              <span class="tag">Most booked</span>
+              <h3>Event tables</h3>
+              <p>Great for dining layouts, gift tables, food service stations, and prep areas.</p>
+              <div class="price-row">
+                <div>
+                  <div class="price">Starting at $12</div>
+                  <div class="meta">per table</div>
+                </div>
+              </div>
+              <ul class="card-list">
+                <li>Flexible for birthdays, showers, and vendor booths</li>
+                <li>Easy to pair with chair and canopy packages</li>
+              </ul>
+            </article>
+            <article class="card catalog-card">
+              <span class="tag">Guest seating</span>
+              <h3>Comfortable chairs</h3>
+              <p>Dependable seating options for ceremonies, receptions, family parties, and school events.</p>
+              <div class="price-row">
+                <div>
+                  <div class="price">Starting at $2</div>
+                  <div class="meta">per chair</div>
+                </div>
+              </div>
+              <ul class="card-list">
+                <li>Ideal for supplementing venue furniture</li>
+                <li>Easy to scale for larger guest counts</li>
+              </ul>
+            </article>
+            <article class="card catalog-card">
+              <span class="tag">Outdoor comfort</span>
+              <h3>Canopy coverage</h3>
+              <p>Create shaded gathering space for food lines, guest seating, and outdoor ceremonies.</p>
+              <div class="price-row">
+                <div>
+                  <div class="price">Starting at $85</div>
+                  <div class="meta">per canopy</div>
+                </div>
+              </div>
+              <ul class="card-list">
+                <li>Helpful for sunny backyards and open venues</li>
+                <li>Pairs well with fan and cooler add-ons</li>
+              </ul>
+            </article>
+            <article class="card catalog-card">
+              <span class="tag">Add-on bundle</span>
+              <h3>Fans & coolers</h3>
+              <p>Keep guests comfortable and drinks accessible during warm-weather celebrations.</p>
+              <div class="price-row">
+                <div>
+                  <div class="price">Starting at $18</div>
+                  <div class="meta">per item</div>
+                </div>
+              </div>
+              <ul class="card-list">
+                <li>Useful for dance floors, serving stations, and kid zones</li>
+                <li>Popular for summer parties and community events</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="showcase">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-intro">
+              <span class="eyebrow">Visual showcase</span>
+              <h2>Browse event-ready setups by category.</h2>
+              <p>Stronger visuals and labels make it easier to imagine how each rental fits your event layout.</p>
+            </div>
+          </div>
+          <div class="gallery-grid">
+            <article class="gallery-item">
+              <div class="gallery-image">
+                <span class="category-pill">Tables</span>
+                <img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20900%20600%27%3E%3Crect%20width%3D%27900%27%20height%3D%27600%27%20fill%3D%27%23e2e8f0%27/%3E%3Crect%20x%3D%2790%27%20y%3D%27390%27%20width%3D%27720%27%20height%3D%2744%27%20rx%3D%2712%27%20fill%3D%27%23475569%27/%3E%3Crect%20x%3D%27170%27%20y%3D%27220%27%20width%3D%27560%27%20height%3D%27160%27%20rx%3D%2728%27%20fill%3D%27%2394a3b8%27/%3E%3Ctext%20x%3D%27450%27%20y%3D%27320%27%20text-anchor%3D%27middle%27%20font-family%3D%27Arial%2C%20sans-serif%27%20font-size%3D%2756%27%20fill%3D%27%230f172a%27%3EEvent%20Tables%3C/text%3E%3C/svg%3E" alt="Event tables arranged for a celebration" />
+              </div>
+              <div class="gallery-copy">
+                <h3>Event tables</h3>
+                <p>Use durable surfaces for dining, gifts, dessert displays, and guest check-in stations.</p>
+              </div>
+            </article>
+            <article class="gallery-item">
+              <div class="gallery-image">
+                <span class="category-pill">Chairs</span>
+                <img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20900%20600%27%3E%3Crect%20width%3D%27900%27%20height%3D%27600%27%20fill%3D%27%23dbeafe%27/%3E%3Crect%20x%3D%27180%27%20y%3D%27180%27%20width%3D%27160%27%20height%3D%27180%27%20rx%3D%2724%27%20fill%3D%27%2360a5fa%27/%3E%3Crect%20x%3D%27205%27%20y%3D%27120%27%20width%3D%27110%27%20height%3D%27100%27%20rx%3D%2718%27%20fill%3D%27%231d4ed8%27/%3E%3Crect%20x%3D%27240%27%20y%3D%27360%27%20width%3D%2718%27%20height%3D%27120%27%20fill%3D%27%231e3a8a%27/%3E%3Crect%20x%3D%27285%27%20y%3D%27360%27%20width%3D%2718%27%20height%3D%27120%27%20fill%3D%27%231e3a8a%27/%3E%3Crect%20x%3D%27560%27%20y%3D%27180%27%20width%3D%27160%27%20height%3D%27180%27%20rx%3D%2724%27%20fill%3D%27%2360a5fa%27/%3E%3Crect%20x%3D%27585%27%20y%3D%27120%27%20width%3D%27110%27%20height%3D%27100%27%20rx%3D%2718%27%20fill%3D%27%231d4ed8%27/%3E%3Crect%20x%3D%27620%27%20y%3D%27360%27%20width%3D%2718%27%20height%3D%27120%27%20fill%3D%27%231e3a8a%27/%3E%3Crect%20x%3D%27665%27%20y%3D%27360%27%20width%3D%2718%27%20height%3D%27120%27%20fill%3D%27%231e3a8a%27/%3E%3Ctext%20x%3D%27450%27%20y%3D%27540%27%20text-anchor%3D%27middle%27%20font-family%3D%27Arial%2C%20sans-serif%27%20font-size%3D%2752%27%20fill%3D%27%231e3a8a%27%3EComfortable%20Chairs%3C/text%3E%3C/svg%3E" alt="Rows of chairs ready for guests" />
+              </div>
+              <div class="gallery-copy">
+                <h3>Comfortable chairs</h3>
+                <p>Seat family, friends, and community guests with consistent event-ready arrangements.</p>
+              </div>
+            </article>
+            <article class="gallery-item">
+              <div class="gallery-image">
+                <span class="category-pill">Canopies</span>
+                <img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20900%20600%27%3E%3Crect%20width%3D%27900%27%20height%3D%27600%27%20fill%3D%27%23fef3c7%27/%3E%3Cpolygon%20points%3D%27450%2C110%20170%2C290%20730%2C290%27%20fill%3D%27%23f59e0b%27/%3E%3Crect%20x%3D%27230%27%20y%3D%27290%27%20width%3D%2722%27%20height%3D%27190%27%20fill%3D%27%2392400e%27/%3E%3Crect%20x%3D%27648%27%20y%3D%27290%27%20width%3D%2722%27%20height%3D%27190%27%20fill%3D%27%2392400e%27/%3E%3Crect%20x%3D%27300%27%20y%3D%27310%27%20width%3D%27300%27%20height%3D%27130%27%20rx%3D%2720%27%20fill%3D%27%23fde68a%27/%3E%3Ctext%20x%3D%27450%27%20y%3D%27535%27%20text-anchor%3D%27middle%27%20font-family%3D%27Arial%2C%20sans-serif%27%20font-size%3D%2754%27%20fill%3D%27%2392400e%27%3ECanopy%20Coverage%3C/text%3E%3C/svg%3E" alt="Canopy setup for shaded event space" />
+              </div>
+              <div class="gallery-copy">
+                <h3>Canopy coverage</h3>
+                <p>Keep seating and food stations comfortable with dedicated shade and weather protection.</p>
+              </div>
+            </article>
+            <article class="gallery-item">
+              <div class="gallery-image">
+                <span class="category-pill">Add-ons</span>
+                <img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20900%20600%27%3E%3Crect%20width%3D%27900%27%20height%3D%27600%27%20fill%3D%27%23dcfce7%27/%3E%3Crect%20x%3D%27170%27%20y%3D%27190%27%20width%3D%27240%27%20height%3D%27200%27%20rx%3D%2728%27%20fill%3D%27%2322c55e%27/%3E%3Crect%20x%3D%27205%27%20y%3D%27230%27%20width%3D%27170%27%20height%3D%27120%27%20rx%3D%2716%27%20fill%3D%27%23bbf7d0%27/%3E%3Crect%20x%3D%27500%27%20y%3D%27170%27%20width%3D%2780%27%20height%3D%27240%27%20rx%3D%2724%27%20fill%3D%27%2316a34a%27/%3E%3Ccircle%20cx%3D%27540%27%20cy%3D%27155%27%20r%3D%2734%27%20fill%3D%27%2386efac%27/%3E%3Crect%20x%3D%27620%27%20y%3D%27210%27%20width%3D%27120%27%20height%3D%27160%27%20rx%3D%2724%27%20fill%3D%27%234ade80%27/%3E%3Ctext%20x%3D%27450%27%20y%3D%27535%27%20text-anchor%3D%27middle%27%20font-family%3D%27Arial%2C%20sans-serif%27%20font-size%3D%2754%27%20fill%3D%27%23166534%27%3EParty%20Essentials%3C/text%3E%3C/svg%3E" alt="Fans and coolers staged as event add-ons" />
+              </div>
+              <div class="gallery-copy">
+                <h3>Party essentials</h3>
+                <p>Add cooling and beverage support so guests stay refreshed throughout the event.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="service">
+        <div class="container trust-grid">
+          <article class="service-card">
+            <span class="eyebrow">Service areas</span>
+            <h2>Serving local events with practical delivery support.</h2>
+            <p>Ideal for backyard celebrations, church functions, school events, and community gatherings.</p>
+            <ul class="service-area-list">
+              <li>Neighborhood parties and family reunions</li>
+              <li>Wedding receptions and showers</li>
+              <li>Corporate and nonprofit gatherings</li>
+              <li>Seasonal events, pop-ups, and festivals</li>
+            </ul>
+          </article>
+          <article class="service-card" id="payment">
+            <span class="eyebrow">Contact & payment</span>
+            <h2>Know what to do after you submit your request.</h2>
+            <ul class="card-list">
+              <li>Send your quantities and event details through the booking form</li>
+              <li>Review your confirmation email and availability follow-up</li>
+              <li>Use the shared payment instructions to confirm your reservation</li>
+              <li>Expect clear pickup, delivery, or setup timing before your event day</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="reviews">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-intro">
+              <span class="eyebrow">Testimonials</span>
+              <h2>Why customers feel confident booking.</h2>
+              <p>Simple, trust-building social proof helps new customers understand the experience.</p>
+            </div>
+          </div>
+          <div class="testimonial-grid">
+            <article class="testimonial">
+              <blockquote>
+                “The setup made our backyard party feel organized right away. We knew what was included and what to do next.”
+              </blockquote>
+              <strong>Maria G.</strong>
+              <div class="testimonial-role">Birthday celebration host</div>
+            </article>
+            <article class="testimonial">
+              <blockquote>
+                “The booking process was straightforward, and the add-ons made a huge difference for guest comfort during a hot afternoon.”
+              </blockquote>
+              <strong>Andre T.</strong>
+              <div class="testimonial-role">Family reunion organizer</div>
+            </article>
+            <article class="testimonial">
+              <blockquote>
+                “We appreciated the quick follow-up, clear pricing starting points, and the polished presentation of the rental options.”
+              </blockquote>
+              <strong>Keisha P.</strong>
+              <div class="testimonial-role">Community event coordinator</div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="container">
+          <div class="section-header">
+            <div class="section-intro">
+              <span class="eyebrow">Booking steps</span>
+              <h2>Three steps from browsing to event day.</h2>
+              <p>Clear guidance reduces back-and-forth and helps customers move forward with confidence.</p>
+            </div>
+          </div>
+          <div class="steps-grid">
+            <article class="step-card">
+              <span class="tag">Step 1</span>
+              <h3>Browse featured rentals</h3>
+              <p>Review inventory cards, pricing starters, and showcase images to outline your setup needs.</p>
+            </article>
+            <article class="step-card">
+              <span class="tag">Step 2</span>
+              <h3>Send your booking request</h3>
+              <p>Share your contact details and exact quantities so availability can be confirmed.</p>
+            </article>
+            <article class="step-card">
+              <span class="tag">Step 3</span>
+              <h3>Confirm payment and logistics</h3>
+              <p>Receive next-step guidance for payment, delivery timing, and final event coordination.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="book">
+        <div class="container booking-shell">
+          <div class="section-header">
+            <div class="section-intro">
+              <span class="eyebrow">Book your event</span>
+              <h2>Request availability and tell us what you need.</h2>
+              <p>Choose at least one rental item and we will follow up with confirmation details.</p>
+            </div>
+          </div>
+          <div class="booking-grid">
+            <form id="booking-form">
+              <div class="form-grid">
+                <div class="field full">
+                  <label for="clientName">Client name</label>
+                  <input id="clientName" name="clientName" type="text" required />
+                </div>
+                <div class="field full">
+                  <label for="clientEmail">Client email</label>
+                  <input id="clientEmail" name="clientEmail" type="email" required />
+                </div>
+                <div class="field">
+                  <label for="tables">Tables</label>
+                  <input id="tables" name="tables" type="number" min="0" value="0" />
+                </div>
+                <div class="field">
+                  <label for="chairs">Chairs</label>
+                  <input id="chairs" name="chairs" type="number" min="0" value="0" />
+                </div>
+                <div class="field">
+                  <label for="canopies">Canopies</label>
+                  <input id="canopies" name="canopies" type="number" min="0" value="0" />
+                </div>
+                <div class="field">
+                  <label for="fans">Fans</label>
+                  <input id="fans" name="fans" type="number" min="0" value="0" />
+                </div>
+                <div class="field full">
+                  <label for="coolers">Coolers</label>
+                  <input id="coolers" name="coolers" type="number" min="0" value="0" />
+                </div>
+              </div>
+              <div class="hero-actions" style="margin-top: 20px;">
+                <button type="submit">Request booking</button>
+              </div>
+            </form>
+            <aside class="card">
+              <span class="eyebrow">Booking guidance</span>
+              <h3>What happens after you submit?</h3>
+              <ul class="steps-list">
+                <li>We review your requested items and event size</li>
+                <li>We confirm availability and any recommended add-ons</li>
+                <li>We share payment instructions and timing details</li>
+              </ul>
+              <div class="cta-banner" style="margin-top: 18px;">
+                <strong>Tip:</strong>
+                <p class="booking-note">Use the quantity fields to request your exact guest setup, then watch for a follow-up message at your email address.</p>
+              </div>
+            </aside>
+          </div>
+          <section id="booking-summary" class="card" hidden style="margin-top: 22px;">
+            <h2>Booking confirmation</h2>
+            <div class="summary" id="summary-content"></div>
+          </section>
+        </div>
       </section>
     </main>
+
+    <footer class="footer">
+      <div class="container">
+        <strong>Your Party Rentals</strong>
+        <p>Polished rental essentials, visual planning help, and clear booking guidance for your next event.</p>
+      </div>
+    </footer>
 
     <script>
       const form = document.getElementById("booking-form");
@@ -125,24 +936,28 @@
           })
           .filter((entry) => entry.qty > 0);
 
+        summary.hidden = false;
+        summaryContent.textContent = "";
+
         if (!selectedItems.length) {
-          summary.hidden = false;
           summaryContent.textContent = "Please choose at least one rental item to complete your booking.";
           return;
         }
-
-        summary.hidden = false;
-        summaryContent.textContent = "";
 
         const thankYou = document.createElement("p");
         thankYou.textContent = `Thank you, ${clientName}.`;
         summaryContent.appendChild(thankYou);
 
         const confirmation = document.createElement("p");
-        confirmation.textContent = `We received your booking request at ${clientEmail}.`;
+        confirmation.textContent = `We received your booking request at ${clientEmail}. Watch for availability, payment guidance, and event coordination details in our follow-up.`;
         summaryContent.appendChild(confirmation);
 
+        const detailHeading = document.createElement("p");
+        detailHeading.textContent = "Requested items:";
+        summaryContent.appendChild(detailHeading);
+
         const itemList = document.createElement("ul");
+        itemList.className = "summary-list";
         selectedItems.forEach((entry) => {
           const listItem = document.createElement("li");
           listItem.textContent = `${entry.item[0].toUpperCase()}${entry.item.slice(1)}: ${entry.qty}`;
