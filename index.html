@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouR Party Rentals LLC</title>
+    <meta
+      name="description"
+      content="Book tables, chairs, canopies, fans, and ice chests with a modern two-month advance booking calendar."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="config.js"></script>
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+
+    <header class="site-header">
+      <div class="brand-wrap">
+        <img
+          src="assets/yourr-logo.png"
+          alt="YouR Party Rentals LLC Logo"
+          class="brand-logo"
+          onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='grid';"
+        />
+        <div id="logo-fallback" class="logo-fallback" aria-label="YouR Party Rentals LLC">
+          <span class="wordmark">YouR</span>
+          <small>PARTY RENTALS LLC</small>
+        </div>
+      </div>
+      <nav class="site-nav">
+        <a href="#rentals">Rentals</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#book">Book</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero reveal">
+        <div>
+          <p class="eyebrow">Celebrate Better</p>
+          <h1>Modern party rentals with easy advance booking.</h1>
+          <p class="hero-copy">
+            Reserve tables, chairs, canopies, fans, and ice chests in minutes.
+            Pick your date up to two months in advance and submit your request.
+          </p>
+          <a href="#book" class="cta-btn">Book Your Date</a>
+        </div>
+        <aside class="hero-card">
+          <h2>Popular Starter Set</h2>
+          <ul>
+            <li>6 Tables</li>
+            <li>48 Chairs</li>
+            <li>1 Canopy</li>
+            <li>2 Fans</li>
+            <li>2 Ice Chests</li>
+          </ul>
+          <p>Perfect for birthdays, graduations, and family reunions.</p>
+        </aside>
+      </section>
+
+      <section id="rentals" class="rentals reveal stagger-parent">
+        <h2>Rental Inventory</h2>
+        <div id="rental-inventory-grid" class="card-grid"></div>
+      </section>
+
+      <section id="gallery" class="gallery reveal">
+        <h2>Gallery</h2>
+        <p>Photos from real setups, uploaded by our team.</p>
+        <div id="gallery-grid" class="gallery-grid"></div>
+      </section>
+
+      <section id="packages" class="packages reveal">
+        <h2>Event Packages</h2>
+        <p>Choose a ready-to-go setup, then adjust quantities below if needed.</p>
+        <div id="package-grid" class="package-grid"></div>
+      </section>
+
+      <section id="book" class="booking reveal">
+        <div class="booking-head">
+          <h2>Book in Advance</h2>
+          <div class="calendar-controls">
+            <button id="prev-month" type="button" aria-label="Previous month">
+              Previous
+            </button>
+            <p id="month-range-label" aria-live="polite"></p>
+            <button id="next-month" type="button" aria-label="Next month">
+              Next
+            </button>
+          </div>
+        </div>
+
+        <div id="two-month-calendar" class="two-month-calendar"></div>
+
+        <form id="booking-form" class="booking-form" novalidate>
+          <h3>Your Booking Request</h3>
+
+          <label>
+            Full Name
+            <input type="text" name="fullName" required />
+          </label>
+
+          <label>
+            Email
+            <input type="email" name="email" required />
+          </label>
+
+          <label>
+            Selected Date
+            <input type="text" id="selected-date" name="selectedDate" readonly required />
+          </label>
+
+          <label id="time-slot-field" class="time-slot-field" hidden>
+            Drop-off Time
+            <select id="time-slot" name="selectedTime" required disabled>
+              <option value="">Select a date first</option>
+            </select>
+          </label>
+
+          <div class="quantity-grid">
+            <label>
+              Tables <span class="price-tag" data-price-for="tables">$10 each</span>
+              <input type="number" name="tables" min="0" value="0" />
+            </label>
+            <label>
+              Chairs <span class="price-tag" data-price-for="chairs">$2 each</span>
+              <input type="number" name="chairs" min="0" value="0" />
+            </label>
+            <label>
+              Canopies <span class="price-tag" data-price-for="canopies">$75 each</span>
+              <input type="number" name="canopies" min="0" value="0" />
+            </label>
+            <label>
+              Fans <span class="price-tag" data-price-for="fans">$20 each</span>
+              <input type="number" name="fans" min="0" value="0" />
+            </label>
+            <label>
+              Ice Chests <span class="price-tag" data-price-for="iceChests">$15 each</span>
+              <input type="number" name="iceChests" min="0" value="0" />
+            </label>
+          </div>
+
+          <aside class="quote-box" aria-live="polite">
+            <h4>Estimated Quote</h4>
+            <p>Tables: <strong id="quote-tables">$0.00</strong></p>
+            <p>Chairs: <strong id="quote-chairs">$0.00</strong></p>
+            <p>Canopies: <strong id="quote-canopies">$0.00</strong></p>
+            <p>Fans: <strong id="quote-fans">$0.00</strong></p>
+            <p>Ice Chests: <strong id="quote-iceChests">$0.00</strong></p>
+            <p class="quote-total">Total: <strong id="quote-total">$0.00</strong></p>
+          </aside>
+
+          <label>
+            Event Notes
+            <textarea
+              name="notes"
+              rows="4"
+              placeholder="Event location, delivery preference, start time, etc."
+            ></textarea>
+          </label>
+
+          <button class="submit-btn" type="submit">Submit Booking</button>
+          <p id="form-status" aria-live="polite"></p>
+        </form>
+
+        <section id="payment-panel" class="payment-panel" hidden aria-labelledby="payment-heading">
+          <p class="eyebrow">Next Step</p>
+          <h3 id="payment-heading">Secure Your Booking</h3>
+          <p>
+            Your booking request is ready. Continue to our secure payment page
+            to enter your credit card information. Card details are handled by
+            the payment provider and are never stored on this website.
+          </p>
+          <p class="payment-amount">Amount due: <strong id="payment-total">$0.00</strong></p>
+          <button id="pay-now-btn" class="submit-btn" type="button">Continue to Secure Payment</button>
+          <p id="payment-status" aria-live="polite"></p>
+        </section>
+
+        <div class="contact-strip">
+          <p>Need help before booking?</p>
+          <a id="contact-phone" href="tel:+10000000000">Call Us</a>
+          <a id="contact-text" href="sms:+10000000000">Text Us</a>
+          <a id="contact-email" href="mailto:bookings@example.com">Email Us</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>YouR Party Rentals LLC</p>
+      <p>Reliable event rentals for every celebration.</p>
+      <p><a href="admin-gallery.html">Gallery Admin</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

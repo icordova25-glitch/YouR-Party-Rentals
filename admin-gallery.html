@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gallery Admin | YouR Party Rentals LLC</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="config.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand-wrap">
+        <div id="logo-fallback" class="logo-fallback" aria-label="YouR Party Rentals LLC">
+          <span class="wordmark">YouR</span>
+          <small>PARTY RENTALS LLC</small>
+        </div>
+      </div>
+      <nav class="site-nav">
+        <a href="index.html">Back to Site</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="admin-login" class="booking reveal">
+        <h2>Gallery Admin Login</h2>
+        <form id="admin-login-form" class="booking-form" novalidate>
+          <label>
+            Admin Username
+            <input type="text" name="username" required autocomplete="username" />
+          </label>
+          <label>
+            Admin Password
+            <input type="password" name="password" required autocomplete="current-password" />
+          </label>
+          <button class="submit-btn" type="submit">Log In</button>
+          <p id="login-status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section id="admin-panel" class="booking reveal" hidden>
+        <div class="booking-head">
+          <h2>Manage Gallery Images</h2>
+          <button id="logout-btn" type="button">Log Out</button>
+        </div>
+
+        <form id="upload-form" class="booking-form" novalidate>
+          <label>
+            Upload Image
+            <input type="file" name="image" accept="image/*" required />
+          </label>
+          <label>
+            Caption
+            <input type="text" name="caption" placeholder="e.g. Backyard birthday setup" />
+          </label>
+          <button class="submit-btn" type="submit">Add to Gallery</button>
+          <p id="upload-status" aria-live="polite"></p>
+        </form>
+
+        <div id="admin-gallery-grid" class="gallery-grid"></div>
+
+        <section class="admin-settings" aria-labelledby="settings-heading">
+          <h2 id="settings-heading">Business Settings</h2>
+          <p class="settings-note">These details stay private in the admin area.</p>
+          <form id="settings-form" class="booking-form" novalidate>
+            <h3>Payment Deposit Information</h3>
+            <label>
+              Account Holder
+              <input type="text" name="accountHolder" autocomplete="name" />
+            </label>
+            <label>
+              Bank Name
+              <input type="text" name="bankName" autocomplete="organization" />
+            </label>
+            <label>
+              Account Number
+              <input type="text" name="accountNumber" inputmode="numeric" autocomplete="off" />
+            </label>
+            <label>
+              Routing Number
+              <input type="text" name="routingNumber" inputmode="numeric" autocomplete="off" />
+            </label>
+
+            <h3>Booking Confirmation Notifications</h3>
+            <label>
+              Notification Email
+              <input type="email" name="notificationEmail" autocomplete="email" />
+            </label>
+            <label>
+              Notification Phone
+              <input type="tel" name="notificationPhone" autocomplete="tel" />
+            </label>
+            <button class="submit-btn" type="submit">Save Business Settings</button>
+            <p id="settings-status" aria-live="polite"></p>
+          </form>
+
+            <form id="availability-form" class="booking-form" novalidate>
+              <h3>Drop-off Time Slots</h3>
+              <p class="settings-note">Set custom times for a date. Leave the slot list empty to restore the default 8 AM to 6 PM schedule.</p>
+              <label>
+                Date to Edit
+                <input type="date" name="availabilityDate" required />
+              </label>
+              <label>
+                Available Times
+                <input type="text" name="availabilitySlots" placeholder="08:00, 10:00, 12:00, 14:00, 16:00, 18:00" />
+              </label>
+              <button class="submit-btn" type="submit">Save Date Availability</button>
+              <p id="availability-status" aria-live="polite"></p>
+            </form>
+
+            <form id="catalog-form" class="booking-form" novalidate>
+              <h3>Inventory &amp; Prices</h3>
+              <p class="settings-note">Set the quantity available and rental price for each product.</p>
+              <div id="inventory-editor" class="inventory-editor"></div>
+
+              <h3>Booking Packages</h3>
+              <p class="settings-note">Add up to four packages. Empty package rows are ignored.</p>
+              <div id="package-editor" class="package-editor"></div>
+              <button id="add-package-btn" type="button">Add Package</button>
+              <button class="submit-btn" type="submit">Save Inventory &amp; Packages</button>
+              <p id="catalog-status" aria-live="polite"></p>
+            </form>
+        </section>
+      </section>
+    </main>
+
+    <div id="preview-modal" class="preview-modal" hidden>
+      <div class="preview-dialog" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+        <div class="preview-dialog-head">
+          <h2 id="preview-title">Image Preview</h2>
+          <button id="close-preview-btn" type="button" aria-label="Close image preview">Close</button>
+        </div>
+        <img id="preview-image" src="" alt="" />
+        <p id="preview-caption"></p>
+      </div>
+    </div>
+
+    <footer>
+      <p>YouR Party Rentals LLC</p>
+      <p>Gallery admin tools for authorized staff only.</p>
+    </footer>
+
+    <script src="admin-gallery.js"></script>
+  </body>
+</html>
