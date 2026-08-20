@@ -65,6 +65,12 @@ const APP_CONFIG = window.YPR_CONFIG || {
   businessPhone: "+10000000000",
 };
 
+// Prefix same-origin /api/... calls with a deployed backend URL when configured.
+const API_BASE_URL = (APP_CONFIG.apiBaseUrl || "").replace(/\/$/, "");
+function apiUrl(path) {
+  return `${API_BASE_URL}${path}`;
+}
+
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 let today = new Date();
@@ -128,7 +134,7 @@ async function loadTimeSlots(dateISO) {
   timeSlotSelect.innerHTML = "<option value=\"\">Loading time slots...</option>";
 
   try {
-    const response = await fetch(`/api/dropoff-slots?date=${encodeURIComponent(dateISO)}`);
+    const response = await fetch(apiUrl(`/api/dropoff-slots?date=${encodeURIComponent(dateISO)}`));
     if (!response.ok) {
       throw new Error("Could not load time slots");
     }
@@ -155,7 +161,7 @@ timeSlotSelect.addEventListener("change", () => {
 });
 
 function loadGalleryImages() {
-  return fetch("/api/gallery")
+  return fetch(apiUrl("/api/gallery"))
     .then((response) => (response.ok ? response.json() : []))
     .then((images) => (Array.isArray(images) ? images : []))
     .catch(() => []);
@@ -271,7 +277,7 @@ function renderCatalog() {
 
 async function loadCatalog() {
   try {
-    const response = await fetch("/api/catalog");
+    const response = await fetch(apiUrl("/api/catalog"));
     if (!response.ok) {
       throw new Error("Catalog unavailable");
     }
@@ -293,6 +299,15 @@ async function loadCatalog() {
       fans: { key: "fans", name: "Fans", description: "Portable cooling fans to keep guests comfortable all day." },
       iceChests: { key: "iceChests", name: "Ice Chests", description: "Large-capacity coolers for drinks, food storage, and service." },
     };
+    packages = [
+      {
+        id: "summer-special",
+        name: "Summer Special",
+        description: "4 Tables, 24 Chairs, one 10x20 Canopy, plus your choice of one add-on: Ice Chest, Fan, or Speaker. Note your add-on choice in the booking notes (Speaker is not stocked in inventory and will be confirmed by our team).",
+        price: 169,
+        items: { tables: 4, chairs: 24, canopies: 1, fans: 0, iceChests: 1 },
+      },
+    ];
   }
   renderCatalog();
   updateQuoteFromForm();
@@ -456,7 +471,7 @@ async function sendToBookingEndpoint(payload) {
 
 async function notifyAdmin(payload) {
   try {
-    const response = await fetch("/api/bookings", {
+    const response = await fetch(apiUrl("/api/bookings"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
