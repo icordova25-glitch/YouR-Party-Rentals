@@ -560,7 +560,7 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
         image_data_url = str(payload.get("image", ""))
         caption = str(payload.get("caption", "")).strip()
 
-        match = re.match(r"^data:(image/[\w.+-]+);base64,(.+)$", image_data_url, re.DOTALL)
+        match = re.match(r"^data:(image/[A-Za-z0-9.+-]+);base64,(.+)$", image_data_url, re.DOTALL)
         if not match:
             self.send_json(400, {"error": "A valid image data URL is required."})
             return
@@ -572,7 +572,7 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
             return
 
         try:
-            image_bytes = base64.b64decode(encoded)
+            image_bytes = base64.b64decode(encoded, validate=True)
         except Exception:
             self.send_json(400, {"error": "Could not decode image."})
             return
