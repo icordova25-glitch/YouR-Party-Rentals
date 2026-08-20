@@ -454,6 +454,22 @@ async function sendToBookingEndpoint(payload) {
   return { ok: true, skipped: false };
 }
 
+async function notifyAdmin(payload) {
+  try {
+    const response = await fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      return { ok: false };
+    }
+    return { ok: true, record: await response.json() };
+  } catch (error) {
+    return { ok: false };
+  }
+}
+
 function initCalendarActions() {
   prevMonthBtn.addEventListener("click", () => {
     const prevMonth = new Date(
@@ -536,8 +552,8 @@ function initBookingForm() {
 
     formStatus.textContent = "Submitting booking...";
 
-    sendToBookingEndpoint(bookingRecord)
-      .then(() => {
+    Promise.all([sendToBookingEndpoint(bookingRecord), notifyAdmin(bookingRecord)])
+      .then(([, notifyResult]) => {
         bookings.push(bookingRecord);
         saveBookings();
         bookingForm.reset();
@@ -547,8 +563,14 @@ function initBookingForm() {
         timeSlotField.hidden = true;
         timeSlotSelect.disabled = true;
         updateQuoteFromForm();
-        formStatus.textContent =
-          "Booking request submitted. Quote saved and notification sent.";
+
+        const notifications = notifyResult.ok ? notifyResult.record.notifications : null;
+        const emailSent = notifications?.email?.sent;
+        const smsSent = notifications?.sms?.sent;
+        formStatus.textContent = notifications
+          ? `Booking request submitted. Admin notification: email ${emailSent ? "sent" : "not sent"}, SMS ${smsSent ? "sent" : "not sent"}.`
+          : "Booking request submitted, but the admin notification could not be reached.";
+
         paymentTotal.textContent = toCurrency(quote.total);
         paymentPanel.hidden = false;
         paymentStatus.textContent = APP_CONFIG.paymentCheckoutUrl

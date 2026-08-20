@@ -98,6 +98,13 @@
             <p id="settings-status" aria-live="polite"></p>
           </form>
 
+          <section class="bookings-log" aria-labelledby="bookings-heading">
+            <h3 id="bookings-heading">Recent Booking Requests</h3>
+            <p class="settings-note">Shows whether the notification email/SMS actually sent for each booking.</p>
+            <button id="refresh-bookings-btn" type="button">Refresh</button>
+            <div id="bookings-list"></div>
+          </section>
+
             <form id="availability-form" class="booking-form" novalidate>
               <h3>Drop-off Time Slots</h3>
               <p class="settings-note">Set custom times for a date. Leave the slot list empty to restore the default 8 AM to 6 PM schedule.</p>
@@ -124,6 +131,25 @@
               <button id="add-package-btn" type="button">Add Package</button>
               <button class="submit-btn" type="submit">Save Inventory &amp; Packages</button>
               <p id="catalog-status" aria-live="polite"></p>
+            </form>
+
+            <form id="auth-form" class="booking-form" novalidate>
+              <h3>Admin Login Credentials</h3>
+              <p class="settings-note">Change the temporary username and password after signing in.</p>
+              <label>
+                New Username
+                <input type="text" name="username" minlength="3" required autocomplete="username" />
+              </label>
+              <label>
+                New Password
+                <input type="password" name="password" minlength="8" required autocomplete="new-password" />
+              </label>
+              <label>
+                Confirm New Password
+                <input type="password" name="confirmPassword" minlength="8" required autocomplete="new-password" />
+              </label>
+              <button class="submit-btn" type="submit">Change Login Credentials</button>
+              <p id="auth-status" aria-live="polite"></p>
             </form>
         </section>
       </section>

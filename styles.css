@@ -334,6 +334,34 @@ h1 {
   color: var(--ink-500);
 }
 
+.bookings-log {
+  margin: 1rem 0;
+  padding: 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: #fff;
+}
+
+.bookings-log #refresh-bookings-btn {
+  border: 1px solid #c8d8f1;
+  border-radius: 0.55rem;
+  background: #fff;
+  color: var(--brand-blue);
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.booking-row {
+  margin-top: 0.7rem;
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  color: var(--ink-700);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .inventory-editor,
 .package-editor {
   display: grid;

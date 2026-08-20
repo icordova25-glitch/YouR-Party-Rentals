@@ -40,15 +40,45 @@ Do not add raw card fields to the frontend or send card data through the booking
 
 1. Start the server: `python3 server.py` (defaults to port `3002`).
 2. Open `http://localhost:3002/admin-gallery.html` (linked from the site footer).
-3. Log in with the admin username/password (defaults: `admin` / `yourr-admin`, override with the `GALLERY_ADMIN_USERNAME` / `GALLERY_ADMIN_PASSWORD` environment variables).
-4. Upload images with an optional caption; they're saved to `uploads/gallery/` on the server and immediately appear in the public gallery on `index.html` for every visitor.
-5. Delete images from the admin panel as needed.
+3. Log in with the temporary admin username/password: `admin` / `yourr-admin`.
+4. After signing in, use the Admin Login Credentials section to change the username and password.
+5. Upload images with an optional caption; they're saved to `uploads/gallery/` on the server and immediately appear in the public gallery on `index.html` for every visitor.
+6. Delete images from the admin panel as needed.
 
 Images and metadata are stored under `data/gallery.json` and `uploads/gallery/` (both git-ignored/created automatically). Change the default admin credentials before deploying publicly.
 
 The admin page also includes private fields for payment deposit banking information and booking confirmation notification email/phone details. These are stored in `data/business-settings.json` and are available only through authenticated admin requests. Each uploaded gallery image includes a `Preview` button that opens a larger modal preview before publishing or deleting decisions.
 
 The same admin page includes inventory and price editing for tables, chairs, canopies, fans, and ice chests. It also supports up to four packages; saved packages appear on the public booking page and can prefill the rental quantities.
+
+## Booking Notifications (Real Sending)
+
+Every booking submitted on the public site is sent to the server at `POST /api/bookings`, which:
+- Saves the booking to `data/bookings.json` (viewable in the admin **Recent Booking Requests** panel).
+- Attempts to send a real email to the address in **Notification Email** (Business Settings) via SMTP.
+- Attempts to send a real SMS to the number in **Notification Phone** via Twilio.
+
+Both attempts report an honest `sent` / `not sent` status back to the customer and to the admin log — nothing is falsely reported as delivered. To make delivery actually work, set these environment variables before starting `server.py`:
+
+```
+SMTP_HOST=smtp.yourprovider.com
+SMTP_PORT=587
+SMTP_USERNAME=your-smtp-username
+SMTP_PASSWORD=your-smtp-password
+SMTP_FROM=bookings@yourrpartyrentals.com
+
+TWILIO_ACCOUNT_SID=your-twilio-sid
+TWILIO_AUTH_TOKEN=your-twilio-token
+TWILIO_FROM_NUMBER=+15551234567
+```
+
+If these are not set, bookings still save and the admin log clearly shows "SMTP not configured" / "Twilio not configured" instead of pretending to send.
+
+## Payments and Bank Deposits (Important)
+
+The **Payment Deposit Information** fields (account holder, bank name, account/routing number) in the admin page are stored for your own records only. No money moves as a result of filling in that form — there is no payment processor connected to it.
+
+The only real payment step is `paymentCheckoutUrl` in `config.js`, which redirects the customer to a Stripe Payment Link (or similar hosted checkout) that you create yourself in your own Stripe/payment-provider account. Money deposits to whichever bank account you configured **directly in that provider's dashboard**, not from this site. Set up a real Stripe Payment Link before launch or no payment will be collected.
 
 ## Integrations
 
@@ -60,6 +90,8 @@ This setup enables:
 - Email booking notifications
 - Google Sheets booking log
 - SMS notifications to your cell phone (when Twilio values are configured)
+
+This Google Sheets/Apps Script integration is optional and separate from the built-in `/api/bookings` notification flow described above; both can run at the same time.
 
 ## Branding
 

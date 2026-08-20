@@ -22,6 +22,10 @@ const inventoryEditor = document.getElementById("inventory-editor");
 const packageEditor = document.getElementById("package-editor");
 const addPackageBtn = document.getElementById("add-package-btn");
 const catalogStatus = document.getElementById("catalog-status");
+const authForm = document.getElementById("auth-form");
+const authStatus = document.getElementById("auth-status");
+const bookingsList = document.getElementById("bookings-list");
+const refreshBookingsBtn = document.getElementById("refresh-bookings-btn");
 
 let availabilityOverrides = {};
 
@@ -79,6 +83,8 @@ function showPanel() {
   loadSettings();
   loadAvailability();
   loadCatalog();
+  loadAdminUsername();
+  loadBookings();
 }
 
 function showLogin() {
@@ -233,6 +239,84 @@ async function loadCatalog() {
     catalogStatus.textContent = "Could not load inventory and packages.";
   }
 }
+
+async function loadAdminUsername() {
+  const response = await fetch("/api/admin/auth", { headers: authHeader() });
+  if (response.ok) {
+    const data = await response.json();
+    authForm.elements.username.value = data.username;
+  }
+}
+
+function notificationBadge(result) {
+  if (!result) {
+    return "unknown";
+  }
+  return result.sent ? "sent" : `not sent (${result.detail || "skipped"})`;
+}
+
+async function loadBookings() {
+  try {
+    const response = await fetch("/api/admin/bookings", { headers: authHeader() });
+    if (!response.ok) {
+      throw new Error("Could not load bookings");
+    }
+    const bookings = await response.json();
+    bookingsList.innerHTML = "";
+
+    if (bookings.length === 0) {
+      bookingsList.innerHTML = "<p>No booking requests yet.</p>";
+      return;
+    }
+
+    [...bookings].reverse().forEach((booking) => {
+      const row = document.createElement("div");
+      row.className = "booking-row";
+      row.innerHTML = `
+        <strong>${booking.fullName || "(no name)"}</strong> - ${booking.selectedDate || ""} ${booking.selectedTime || ""}<br>
+        Email: ${booking.email || "(none)"} | Total: $${Number(booking.quoteTotal || 0).toFixed(2)}<br>
+        Notification email: ${notificationBadge(booking.notifications?.email)} | SMS: ${notificationBadge(booking.notifications?.sms)}
+      `;
+      bookingsList.appendChild(row);
+    });
+  } catch (error) {
+    bookingsList.innerHTML = "<p>Could not load booking requests.</p>";
+  }
+}
+
+refreshBookingsBtn.addEventListener("click", loadBookings);
+
+authForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const formData = new FormData(authForm);
+  const username = String(formData.get("username") || "").trim();
+  const password = String(formData.get("password") || "");
+  const confirmPassword = String(formData.get("confirmPassword") || "");
+
+  if (password !== confirmPassword) {
+    authStatus.textContent = "The passwords do not match.";
+    return;
+  }
+
+  authStatus.textContent = "Saving...";
+  try {
+    const response = await fetch("/api/admin/auth", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...authHeader() },
+      body: JSON.stringify({ username, password }),
+    });
+    const body = await response.json();
+    if (!response.ok) {
+      throw new Error(body.error || "Could not change credentials.");
+    }
+    sessionStorage.removeItem(AUTH_KEY);
+    authForm.reset();
+    showLogin();
+    loginStatus.textContent = "Credentials changed. Log in with your new username and password.";
+  } catch (error) {
+    authStatus.textContent = error.message;
+  }
+});
 
 addPackageBtn.addEventListener("click", () => addPackageEditor());
 

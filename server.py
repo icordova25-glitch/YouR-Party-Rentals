@@ -5,6 +5,10 @@ Env vars:
   GALLERY_ADMIN_USERNAME (default: admin)
   GALLERY_ADMIN_PASSWORD (default: yourr-admin)
   PORT (default: 3002)
+
+Optional booking notification env vars (leave unset to skip real sending):
+  SMTP_HOST, SMTP_PORT (default 587), SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM
+  TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER
 """
 
 import base64
@@ -12,7 +16,12 @@ import json
 import mimetypes
 import os
 import re
+import smtplib
+import ssl
+import urllib.error
+import urllib.request
 import uuid
+from email.message import EmailMessage
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -25,6 +34,8 @@ GALLERY_PATH = DATA_DIR / "gallery.json"
 SETTINGS_PATH = DATA_DIR / "business-settings.json"
 AVAILABILITY_PATH = DATA_DIR / "dropoff-availability.json"
 CATALOG_PATH = DATA_DIR / "catalog.json"
+AUTH_PATH = DATA_DIR / "admin-auth.json"
+BOOKINGS_PATH = DATA_DIR / "bookings.json"
 
 GALLERY_ADMIN_USERNAME = os.getenv("GALLERY_ADMIN_USERNAME", "admin")
 GALLERY_ADMIN_PASSWORD = os.getenv("GALLERY_ADMIN_PASSWORD", "yourr-admin")
@@ -71,6 +82,13 @@ def ensure_data_files():
         write_json(AVAILABILITY_PATH, {})
     if not CATALOG_PATH.exists():
         write_json(CATALOG_PATH, DEFAULT_CATALOG)
+    if not AUTH_PATH.exists():
+        write_json(AUTH_PATH, {
+            "username": os.getenv("GALLERY_ADMIN_USERNAME", "admin"),
+            "password": os.getenv("GALLERY_ADMIN_PASSWORD", "yourr-admin"),
+        })
+    if not BOOKINGS_PATH.exists():
+        write_json(BOOKINGS_PATH, [])
 
 
 def default_settings():
@@ -223,7 +241,141 @@ def is_authorized(auth_header):
         username, _, password = decoded.partition(":")
     except Exception:
         return False
-    return username == GALLERY_ADMIN_USERNAME and password == GALLERY_ADMIN_PASSWORD
+    auth = read_admin_auth()
+    return username == auth["username"] and password == auth["password"]
+
+
+def read_admin_auth():
+    ensure_data_files()
+    try:
+        with AUTH_PATH.open("r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (FileNotFoundError, json.JSONDecodeError):
+        data = {}
+    return {
+        "username": str(data.get("username") or GALLERY_ADMIN_USERNAME),
+        "password": str(data.get("password") or GALLERY_ADMIN_PASSWORD),
+    }
+
+
+def write_admin_auth(username, password):
+    auth = {"username": username.strip()[:80], "password": password[:200]}
+    write_json(AUTH_PATH, auth)
+    return auth
+
+
+def read_bookings():
+    ensure_data_files()
+    return read_json(BOOKINGS_PATH, [])
+
+
+def write_bookings(bookings):
+    write_json(BOOKINGS_PATH, bookings)
+
+
+def format_booking_message(payload):
+    item_lines = "\n".join(
+        f"- {key}: {payload.get(key, 0)}"
+        for key in ("tables", "chairs", "canopies", "fans", "iceChests")
+        if float(payload.get(key, 0) or 0) > 0
+    )
+    return (
+        f"New booking request\n\n"
+        f"Name: {payload.get('fullName', '')}\n"
+        f"Email: {payload.get('email', '')}\n"
+        f"Date: {payload.get('selectedDate', '')}\n"
+        f"Time: {payload.get('selectedTime', '')}\n\n"
+        f"Items:\n{item_lines or '(none)'}\n\n"
+        f"Quote Total: ${float(payload.get('quoteTotal', 0) or 0):.2f}\n\n"
+        f"Notes: {payload.get('notes') or '(none)'}"
+    )
+
+
+def send_notification_email(to_email, subject, body):
+    host = os.getenv("SMTP_HOST")
+    if not to_email or not host:
+        return False, "SMTP not configured" if not host else "No notification email set"
+
+    port = int(os.getenv("SMTP_PORT", "587"))
+    username = os.getenv("SMTP_USERNAME", "")
+    password = os.getenv("SMTP_PASSWORD", "")
+    sender = os.getenv("SMTP_FROM", username or "bookings@yourrpartyrentals.com")
+
+    message = EmailMessage()
+    message["Subject"] = subject
+    message["From"] = sender
+    message["To"] = to_email
+    message.set_content(body)
+
+    try:
+        context = ssl.create_default_context()
+        with smtplib.SMTP(host, port, timeout=10) as smtp:
+            smtp.starttls(context=context)
+            if username:
+                smtp.login(username, password)
+            smtp.send_message(message)
+        return True, "sent"
+    except Exception as error:  # noqa: BLE001 - report any delivery failure back to caller
+        return False, str(error)
+
+
+def send_notification_sms(to_phone, body):
+    account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+    auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+    from_number = os.getenv("TWILIO_FROM_NUMBER")
+
+    if not to_phone:
+        return False, "No notification phone set"
+    if not (account_sid and auth_token and from_number):
+        return False, "Twilio not configured"
+
+    url = f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json"
+    data = f"To={to_phone}&From={from_number}&Body={body}".encode("utf-8")
+    auth_header = "Basic " + base64.b64encode(f"{account_sid}:{auth_token}".encode()).decode()
+    request = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            "Authorization": auth_header,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=10) as response:
+            return response.status < 300, "sent"
+    except urllib.error.HTTPError as error:
+        return False, error.read().decode("utf-8", "ignore")
+    except Exception as error:  # noqa: BLE001 - report any delivery failure back to caller
+        return False, str(error)
+
+
+def create_booking(payload):
+    settings = read_settings()
+    message = format_booking_message(payload)
+
+    email_sent, email_detail = send_notification_email(
+        settings.get("notificationEmail", ""),
+        f"New Booking: {payload.get('selectedDate', '')}",
+        message,
+    )
+    sms_sent, sms_detail = send_notification_sms(
+        settings.get("notificationPhone", ""),
+        message[:300],
+    )
+
+    record = dict(payload)
+    record["id"] = uuid.uuid4().hex
+    record["receivedAt"] = datetime.now(timezone.utc).isoformat()
+    record["notifications"] = {
+        "email": {"sent": email_sent, "detail": email_detail},
+        "sms": {"sent": sms_sent, "detail": sms_detail},
+    }
+
+    bookings = read_bookings()
+    bookings.append(record)
+    write_bookings(bookings)
+    return record
 
 
 class GalleryRequestHandler(BaseHTTPRequestHandler):
@@ -299,6 +451,13 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
             self.send_json(200, read_settings())
             return
 
+        if path == "/api/admin/auth":
+            if not is_authorized(self.headers.get("Authorization")):
+                self.send_unauthorized()
+                return
+            self.send_json(200, {"username": read_admin_auth()["username"]})
+            return
+
         if path == "/api/admin/availability":
             if not is_authorized(self.headers.get("Authorization")):
                 self.send_unauthorized()
@@ -311,6 +470,13 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
                 self.send_unauthorized()
                 return
             self.send_json(200, read_catalog())
+            return
+
+        if path == "/api/admin/bookings":
+            if not is_authorized(self.headers.get("Authorization")):
+                self.send_unauthorized()
+                return
+            self.send_json(200, read_bookings())
             return
 
         if path in STATIC_FILES:
@@ -334,6 +500,22 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urlparse(self.path)
+
+        if parsed.path == "/api/bookings":
+            try:
+                payload = self.read_json_body()
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+
+            if not isinstance(payload, dict) or not payload.get("selectedDate"):
+                self.send_json(400, {"error": "A booking payload with selectedDate is required."})
+                return
+
+            record = create_booking(payload)
+            self.send_json(201, record)
+            return
+
         if parsed.path != "/api/gallery":
             self.send_json(404, {"error": "Not found."})
             return
@@ -390,7 +572,7 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
 
     def do_PUT(self):
         parsed = urlparse(self.path)
-        if parsed.path not in ("/api/admin/settings", "/api/admin/availability", "/api/admin/catalog"):
+        if parsed.path not in ("/api/admin/settings", "/api/admin/availability", "/api/admin/catalog", "/api/admin/auth"):
             self.send_json(404, {"error": "Not found."})
             return
 
@@ -406,6 +588,15 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
 
         if not isinstance(payload, dict):
             self.send_json(400, {"error": "Settings must be an object."})
+            return
+
+        if parsed.path == "/api/admin/auth":
+            username = str(payload.get("username", "")).strip()
+            password = str(payload.get("password", ""))
+            if len(username) < 3 or len(password) < 8:
+                self.send_json(400, {"error": "Username must be at least 3 characters and password at least 8 characters."})
+                return
+            self.send_json(200, {"username": write_admin_auth(username, password)["username"]})
             return
 
         if parsed.path == "/api/admin/availability":
