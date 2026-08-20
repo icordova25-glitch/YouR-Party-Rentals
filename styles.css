@@ -122,9 +122,6 @@ main {
   border: 1px solid #dfe8f8;
   border-radius: 1.7rem;
   padding: 2rem;
-  display: grid;
-  grid-template-columns: 1.25fr 0.95fr;
-  gap: 1.4rem;
   box-shadow: var(--shadow);
 }
 
@@ -168,24 +165,6 @@ h1 {
 
 .cta-btn:hover {
   transform: translateY(-2px);
-}
-
-.hero-card {
-  background: #fff;
-  border-radius: 1.05rem;
-  border: 1px solid #e2ebf8;
-  padding: 1rem;
-}
-
-.hero-card ul {
-  margin: 0.7rem 0;
-  padding-left: 1.1rem;
-  color: var(--ink-700);
-}
-
-.hero-card p {
-  margin: 0;
-  color: var(--ink-500);
 }
 
 .rentals,
@@ -778,10 +757,6 @@ footer {
 }
 
 @media (max-width: 980px) {
-  .hero {
-    grid-template-columns: 1fr;
-  }
-
   .gallery-grid {
     grid-template-columns: repeat(2, 1fr);
   }
