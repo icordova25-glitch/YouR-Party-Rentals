@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: your-party-rentals-api
+    runtime: python
+    plan: free
+    buildCommand: python3 -m py_compile server.py
+    startCommand: python3 server.py
+    healthCheckPath: /api/health
+    disk:
+      name: your-party-rentals-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /var/data/data
+      - key: UPLOADS_DIR
+        value: /var/data/uploads/gallery
+      - key: GALLERY_ADMIN_USERNAME
+        sync: false
+      - key: GALLERY_ADMIN_PASSWORD
+        sync: false
+      - key: CORS_ALLOWED_ORIGIN
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false

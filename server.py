@@ -5,6 +5,7 @@ Env vars:
   GALLERY_ADMIN_USERNAME (default: admin)
   GALLERY_ADMIN_PASSWORD (default: yourr-admin)
   PORT (default: 3002)
+  CORS_ALLOWED_ORIGIN (default: *; set to your frontend's exact origin in production)
 
 Optional booking notification env vars (leave unset to skip real sending):
   SMTP_HOST, SMTP_PORT (default 587), SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM
@@ -28,8 +29,8 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parent
-DATA_DIR = ROOT / "data"
-UPLOADS_DIR = ROOT / "uploads" / "gallery"
+DATA_DIR = Path(os.getenv("DATA_DIR", str(ROOT / "data")))
+UPLOADS_DIR = Path(os.getenv("UPLOADS_DIR", str(DATA_DIR / "uploads" / "gallery")))
 GALLERY_PATH = DATA_DIR / "gallery.json"
 SETTINGS_PATH = DATA_DIR / "business-settings.json"
 AVAILABILITY_PATH = DATA_DIR / "dropoff-availability.json"
@@ -39,6 +40,7 @@ BOOKINGS_PATH = DATA_DIR / "bookings.json"
 
 GALLERY_ADMIN_USERNAME = os.getenv("GALLERY_ADMIN_USERNAME", "admin")
 GALLERY_ADMIN_PASSWORD = os.getenv("GALLERY_ADMIN_PASSWORD", "yourr-admin")
+CORS_ALLOWED_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "*")
 
 STATIC_FILES = {
     "/": "index.html",
@@ -67,7 +69,15 @@ DEFAULT_CATALOG = {
         {"key": "fans", "name": "Fans", "description": "Portable cooling fans to keep guests comfortable all day.", "price": 20, "inventory": 30},
         {"key": "iceChests", "name": "Ice Chests", "description": "Large-capacity coolers for drinks, food storage, and service.", "price": 15, "inventory": 40},
     ],
-    "packages": [],
+    "packages": [
+        {
+            "id": "summer-special",
+            "name": "Summer Special",
+            "description": "4 Tables, 24 Chairs, one 10x20 Canopy, plus your choice of one add-on: Ice Chest, Fan, or Speaker. Note your add-on choice in the booking notes (Speaker is not stocked in inventory and will be confirmed by our team).",
+            "price": 169,
+            "items": {"tables": 4, "chairs": 24, "canopies": 1, "fans": 0, "iceChests": 1},
+        }
+    ],
 }
 
 
@@ -384,9 +394,20 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):  # noqa: A002 - matches base signature
         pass
 
+    def add_cors_headers(self):
+        self.send_header("Access-Control-Allow-Origin", CORS_ALLOWED_ORIGIN)
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.add_cors_headers()
+        self.end_headers()
+
     def send_json(self, status, payload):
         body = json.dumps(payload).encode("utf-8")
         self.send_response(status)
+        self.add_cors_headers()
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -394,6 +415,7 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
 
     def send_unauthorized(self):
         self.send_response(401)
+        self.add_cors_headers()
         self.send_header("WWW-Authenticate", 'Basic realm="Gallery Admin"')
         self.send_header("Content-Type", "application/json")
         body = json.dumps({"error": "Authorization required."}).encode("utf-8")
@@ -408,6 +430,7 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
         content_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
         body = file_path.read_bytes()
         self.send_response(200)
+        self.add_cors_headers()
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -423,6 +446,10 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
+
+        if path == "/api/health":
+            self.send_json(200, {"ok": True})
+            return
 
         if path == "/api/gallery":
             self.send_json(200, read_gallery())
@@ -645,7 +672,7 @@ def main():
     ensure_data_files()
     port = int(os.getenv("PORT", "3002"))
     server = ThreadingHTTPServer(("0.0.0.0", port), GalleryRequestHandler)
-    print(f"YouR Party Rentals server running at http://localhost:{port}")
+    print(f"YouR Party Rentals server running at http://0.0.0.0:{port}", flush=True)
     server.serve_forever()
 
 
