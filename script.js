@@ -58,6 +58,7 @@ let itemPrices = { ...DEFAULT_ITEM_PRICES };
 let inventory = {};
 let packages = [];
 let currentCatalogItems = {};
+let latestBookingRecord = null;
 
 const APP_CONFIG = window.YPR_CONFIG || {
   bookingEndpoint: "",
@@ -569,6 +570,7 @@ function initBookingForm() {
 
     Promise.all([sendToBookingEndpoint(bookingRecord), notifyAdmin(bookingRecord)])
       .then(([, notifyResult]) => {
+        latestBookingRecord = bookingRecord;
         bookings.push(bookingRecord);
         saveBookings();
         bookingForm.reset();
@@ -588,9 +590,7 @@ function initBookingForm() {
 
         paymentTotal.textContent = toCurrency(quote.total);
         paymentPanel.hidden = false;
-        paymentStatus.textContent = APP_CONFIG.paymentCheckoutUrl
-          ? "Continue below to enter your card details securely."
-          : "Secure checkout is not configured yet. Please contact us to arrange payment.";
+        paymentStatus.textContent = "Continue below to enter your card details securely with Stripe.";
         renderCalendar();
       })
       .catch(() => {
@@ -601,14 +601,35 @@ function initBookingForm() {
 }
 
 function initPaymentActions() {
-  payNowBtn.addEventListener("click", () => {
-    if (!APP_CONFIG.paymentCheckoutUrl) {
+  payNowBtn.addEventListener("click", async () => {
+    if (!latestBookingRecord && !APP_CONFIG.paymentCheckoutUrl) {
       paymentStatus.textContent =
         "Secure payment is not configured yet. Please use the contact options below.";
       return;
     }
 
-    window.location.assign(APP_CONFIG.paymentCheckoutUrl);
+    if (APP_CONFIG.paymentCheckoutUrl) {
+      window.location.assign(APP_CONFIG.paymentCheckoutUrl);
+      return;
+    }
+
+    paymentStatus.textContent = "Opening secure Stripe checkout...";
+    payNowBtn.disabled = true;
+    try {
+      const response = await fetch(apiUrl("/api/payments/checkout"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(latestBookingRecord),
+      });
+      const body = await response.json();
+      if (!response.ok || !body.url) {
+        throw new Error(body.error || "Could not start secure checkout.");
+      }
+      window.location.assign(body.url);
+    } catch (error) {
+      paymentStatus.textContent = error.message;
+      payNowBtn.disabled = false;
+    }
   });
 }
 

@@ -26,7 +26,7 @@ from email.message import EmailMessage
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = Path(os.getenv("DATA_DIR", str(ROOT / "data")))
@@ -41,6 +41,9 @@ BOOKINGS_PATH = DATA_DIR / "bookings.json"
 GALLERY_ADMIN_USERNAME = os.getenv("GALLERY_ADMIN_USERNAME", "admin")
 GALLERY_ADMIN_PASSWORD = os.getenv("GALLERY_ADMIN_PASSWORD", "yourr-admin")
 CORS_ALLOWED_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "*")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_SUCCESS_URL = os.getenv("STRIPE_SUCCESS_URL", "https://your-party-rentals.com/?payment=success")
+STRIPE_CANCEL_URL = os.getenv("STRIPE_CANCEL_URL", "https://your-party-rentals.com/?payment=cancelled")
 
 STATIC_FILES = {
     "/": "index.html",
@@ -388,6 +391,50 @@ def create_booking(payload):
     return record
 
 
+def create_stripe_checkout(payload):
+    if not STRIPE_SECRET_KEY:
+        return None, "Stripe is not configured on the backend."
+
+    try:
+        total_cents = int(round(float(payload.get("quoteTotal", 0) or 0) * 100))
+    except (TypeError, ValueError):
+        return None, "The booking total is invalid."
+    if total_cents <= 0:
+        return None, "The booking total must be greater than zero."
+
+    form = {
+        "mode": "payment",
+        "success_url": STRIPE_SUCCESS_URL,
+        "cancel_url": STRIPE_CANCEL_URL,
+        "customer_email": str(payload.get("email", "")).strip(),
+        "line_items[0][price_data][currency]": "usd",
+        "line_items[0][price_data][product_data][name]": "YouR Party Rentals booking",
+        "line_items[0][price_data][product_data][description]": f"Event date: {payload.get('selectedDate', '')}",
+        "line_items[0][price_data][unit_amount]": str(total_cents),
+        "line_items[0][quantity]": "1",
+        "metadata[booking_date]": str(payload.get("selectedDate", "")),
+        "metadata[booking_email]": str(payload.get("email", "")),
+    }
+    request = urllib.request.Request(
+        "https://api.stripe.com/v1/checkout/sessions",
+        data=urlencode(form).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {STRIPE_SECRET_KEY}",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            session = json.loads(response.read().decode("utf-8"))
+        return session.get("url"), ""
+    except urllib.error.HTTPError as error:
+        detail = error.read().decode("utf-8", "ignore")
+        return None, f"Stripe rejected the checkout request: {detail[:240]}"
+    except (urllib.error.URLError, json.JSONDecodeError) as error:
+        return None, f"Could not reach Stripe: {error}"
+
+
 class GalleryRequestHandler(BaseHTTPRequestHandler):
     server_version = "YouRPartyRentals/1.0"
 
@@ -541,6 +588,19 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
 
             record = create_booking(payload)
             self.send_json(201, record)
+            return
+
+        if parsed.path == "/api/payments/checkout":
+            try:
+                payload = self.read_json_body()
+                checkout_url, error = create_stripe_checkout(payload)
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                self.send_json(400, {"error": "Invalid request body."})
+                return
+            if not checkout_url:
+                self.send_json(503, {"error": error})
+                return
+            self.send_json(200, {"url": checkout_url})
             return
 
         if parsed.path != "/api/gallery":

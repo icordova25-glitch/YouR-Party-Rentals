@@ -32,7 +32,7 @@ The booking form calculates a live estimate automatically.
 
 ## Secure Payments
 
-After a booking request is submitted, the client sees a payment step with the booking total. Set `paymentCheckoutUrl` in `config.js` to a Stripe Payment Link or hosted Checkout URL before accepting card payments. The customer enters card details on that secure provider page; this site never receives or stores card numbers, expiration dates, or CVC values.
+After a booking request is submitted, the client sees a payment step with the booking total. The backend can create a Stripe Checkout Session when `STRIPE_SECRET_KEY` is configured in Render. The customer enters card details on Stripe's hosted page; this site never receives or stores card numbers, expiration dates, or CVC values.
 
 Do not add raw card fields to the frontend or send card data through the booking endpoint. A production setup should use Stripe Checkout/Payment Links or Stripe Elements with a server-created PaymentIntent and webhook confirmation.
 
@@ -78,7 +78,7 @@ If these are not set, bookings still save and the admin log clearly shows "SMTP 
 
 The **Payment Deposit Information** fields (account holder, bank name, account/routing number) in the admin page are stored for your own records only. No money moves as a result of filling in that form — there is no payment processor connected to it.
 
-The only real payment step is `paymentCheckoutUrl` in `config.js`, which redirects the customer to a Stripe Payment Link (or similar hosted checkout) that you create yourself in your own Stripe/payment-provider account. Money deposits to whichever bank account you configured **directly in that provider's dashboard**, not from this site. Set up a real Stripe Payment Link before launch or no payment will be collected.
+For Stripe Checkout, add `STRIPE_SECRET_KEY` to the Render service environment. Optionally set `STRIPE_SUCCESS_URL` and `STRIPE_CANCEL_URL`; they default to the public booking domain. Money deposits to the bank account configured directly in Stripe's dashboard. Never place the Stripe secret key in `config.js` or any frontend file.
 
 ## Integrations
 
