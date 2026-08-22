@@ -176,7 +176,7 @@ function renderGallery() {
   loadGalleryImages().then((adminImages) => {
     const images =
       adminImages.length > 0
-        ? adminImages.map((image) => ({ src: image.url, caption: image.caption }))
+        ? adminImages.slice(0, 10).map((image) => ({ src: image.url, caption: image.caption }))
         : DEFAULT_GALLERY_IMAGES;
 
     galleryGridEl.innerHTML = "";

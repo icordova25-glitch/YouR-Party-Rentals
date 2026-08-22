@@ -64,6 +64,7 @@ ALLOWED_MIME_TO_EXT = {
 }
 
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
+MAX_GALLERY_IMAGES = 10
 DEFAULT_DROPOFF_SLOTS = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00"]
 DEFAULT_GALLERY = [
     {
@@ -204,11 +205,11 @@ def write_catalog(payload):
 
 def read_gallery():
     ensure_data_files()
-    return read_json(GALLERY_PATH, [])
+    return read_json(GALLERY_PATH, [])[:MAX_GALLERY_IMAGES]
 
 
 def write_gallery(images):
-    write_json(GALLERY_PATH, images)
+    write_json(GALLERY_PATH, images[:MAX_GALLERY_IMAGES])
 
 
 def read_settings():
@@ -645,6 +646,7 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
 
         image_data_url = str(payload.get("image", ""))
         caption = str(payload.get("caption", "")).strip()
+        replace_id = str(payload.get("replaceId", "")).strip()
 
         match = re.match(r"^data:(image/[A-Za-z0-9.+-]+);base64,(.+)$", image_data_url, re.DOTALL)
         if not match:
@@ -668,17 +670,32 @@ class GalleryRequestHandler(BaseHTTPRequestHandler):
             return
 
         ensure_data_files()
+        images = read_gallery()
+        replace_index = next((index for index, image in enumerate(images) if image.get("id") == replace_id), None)
+        if replace_id and replace_index is None:
+            self.send_json(404, {"error": "Image to replace was not found."})
+            return
+        if not replace_id and len(images) >= MAX_GALLERY_IMAGES:
+            self.send_json(400, {"error": f"The gallery can display up to {MAX_GALLERY_IMAGES} images. Delete or replace an image before adding another."})
+            return
+
         filename = f"{uuid.uuid4().hex}{ext}"
         (UPLOADS_DIR / filename).write_bytes(image_bytes)
 
         entry = {
-            "id": uuid.uuid4().hex,
+            "id": replace_id or uuid.uuid4().hex,
             "url": f"/uploads/gallery/{filename}",
             "caption": caption,
             "createdAt": datetime.now(timezone.utc).isoformat(),
         }
-        images = read_gallery()
-        images.append(entry)
+        if replace_id:
+            old_url = images[replace_index].get("url", "")
+            old_file = UPLOADS_DIR / os.path.basename(old_url)
+            if old_url.startswith("/uploads/gallery/") and old_file.exists():
+                old_file.unlink()
+            images[replace_index] = entry
+        else:
+            images.append(entry)
         write_gallery(images)
 
         self.send_json(201, entry)

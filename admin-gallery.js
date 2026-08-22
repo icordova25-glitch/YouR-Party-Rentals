@@ -122,6 +122,7 @@ function renderAdminGallery(images) {
 
   images.forEach((image) => {
     const figure = document.createElement("figure");
+    figure.className = "gallery-card admin-gallery-card";
 
     const img = document.createElement("img");
     img.src = imageUrl(image.url);
@@ -133,18 +134,15 @@ function renderAdminGallery(images) {
     figcaption.textContent = image.caption || "(no caption)";
     figure.appendChild(figcaption);
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.type = "button";
-    deleteBtn.textContent = "Delete";
-    deleteBtn.addEventListener("click", () => deleteImage(image.id));
-    figure.appendChild(deleteBtn);
+    const actions = document.createElement("div");
+    actions.className = "gallery-actions";
 
     const previewBtn = document.createElement("button");
     previewBtn.type = "button";
     previewBtn.className = "preview-btn";
     previewBtn.textContent = "Preview";
     previewBtn.addEventListener("click", () => openPreview(image));
-    figure.appendChild(previewBtn);
+    actions.appendChild(previewBtn);
 
     const replaceBtn = document.createElement("button");
     replaceBtn.type = "button";
@@ -154,7 +152,15 @@ function renderAdminGallery(images) {
       uploadForm.elements.image.click();
       uploadStatus.textContent = "Choose a replacement image, preview it, then add it to the gallery.";
     });
-    figure.appendChild(replaceBtn);
+    actions.appendChild(replaceBtn);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "delete-gallery-btn";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", () => deleteImage(image.id));
+    actions.appendChild(deleteBtn);
+    figure.appendChild(actions);
 
     adminGalleryGrid.appendChild(figure);
   });
@@ -494,7 +500,7 @@ uploadForm.addEventListener("submit", async (event) => {
     const response = await fetch(apiUrl("/api/gallery"), {
       method: "POST",
       headers: { "Content-Type": "application/json", ...authHeader() },
-      body: JSON.stringify({ image: dataUrl, caption }),
+      body: JSON.stringify({ image: dataUrl, caption, replaceId: replacingImageId }),
     });
 
     if (!response.ok) {
@@ -502,20 +508,10 @@ uploadForm.addEventListener("submit", async (event) => {
       throw new Error(body.error || "Upload failed");
     }
 
-    if (replacingImageId) {
-      const oldImageId = replacingImageId;
-      replacingImageId = "";
-      const deleteResponse = await fetch(apiUrl(`/api/gallery/${oldImageId}`), {
-        method: "DELETE",
-        headers: authHeader(),
-      });
-      if (!deleteResponse.ok) {
-        throw new Error("Replacement uploaded, but the old image could not be deleted.");
-      }
-    }
-
+    const action = replacingImageId ? "replaced" : "added to";
+    replacingImageId = "";
     uploadForm.reset();
-    uploadStatus.textContent = "Image added to gallery.";
+    uploadStatus.textContent = `Image ${action} gallery.`;
     loadAdminGallery();
   } catch (error) {
     uploadStatus.textContent = error.message || "Could not upload that image.";
