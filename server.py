@@ -32,6 +32,7 @@ ROOT = Path(__file__).resolve().parent
 DATA_DIR = Path(os.getenv("DATA_DIR", str(ROOT / "data")))
 UPLOADS_DIR = Path(os.getenv("UPLOADS_DIR", str(DATA_DIR / "uploads" / "gallery")))
 GALLERY_PATH = DATA_DIR / "gallery.json"
+GALLERY_SEEDED_PATH = DATA_DIR / ".gallery-seeded"
 SETTINGS_PATH = DATA_DIR / "business-settings.json"
 AVAILABILITY_PATH = DATA_DIR / "dropoff-availability.json"
 CATALOG_PATH = DATA_DIR / "catalog.json"
@@ -64,6 +65,28 @@ ALLOWED_MIME_TO_EXT = {
 
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
 DEFAULT_DROPOFF_SLOTS = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00"]
+DEFAULT_GALLERY = [
+    {
+        "id": "default-elegant-table",
+        "url": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80",
+        "caption": "Elegant table layout",
+    },
+    {
+        "id": "default-guest-seating",
+        "url": "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80",
+        "caption": "Guest seating ready",
+    },
+    {
+        "id": "default-canopy",
+        "url": "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=1200&q=80",
+        "caption": "Canopy coverage",
+    },
+    {
+        "id": "default-ice-chest",
+        "url": "https://images.unsplash.com/photo-1523875194681-bedd468c58bf?auto=format&fit=crop&w=1200&q=80",
+        "caption": "Ice chest beverage station",
+    },
+]
 DEFAULT_CATALOG = {
     "items": [
         {"key": "tables", "name": "Tables", "description": "Rectangular and round event tables for dining and display.", "price": 10, "inventory": 100},
@@ -89,6 +112,9 @@ def ensure_data_files():
     UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
     if not GALLERY_PATH.exists():
         write_json(GALLERY_PATH, [])
+    if not GALLERY_SEEDED_PATH.exists() and read_json(GALLERY_PATH, []) == []:
+        write_json(GALLERY_PATH, DEFAULT_GALLERY)
+        GALLERY_SEEDED_PATH.touch()
     if not SETTINGS_PATH.exists():
         write_json(SETTINGS_PATH, default_settings())
     if not AVAILABILITY_PATH.exists():
